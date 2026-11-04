@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.services
 import "themes.js" as ThemeLib
 
 Singleton {
@@ -97,7 +98,7 @@ Singleton {
     readonly property int gap:          8
     readonly property int padding:      14
     readonly property int topMargin:    6
-    readonly property int weekStart:    1   // 1 = Monday, 0 = Sunday (as in the video)
+    readonly property int weekStart:    Settings.weekStart   // 1 = Monday, 0 = Sunday (Settings > Bar)
 
     // ---- Font ----
     readonly property string fontFamily: Qt.application.font.family

@@ -7,6 +7,7 @@ Item {
     id: root
 
     signal back()
+    property bool embedded: false      // inside the Settings window: no back arrow
 
     readonly property var adapter: Bluetooth.defaultAdapter
     readonly property bool powered: adapter ? adapter.enabled : false
@@ -39,8 +40,9 @@ Item {
     onPoweredChanged: syncDiscovery()
 
     PageHeader {
+        showBack: !root.embedded
         x: 14; y: 14
-        width: 332
+        width: root.width - 28
         title: "Bluetooth"
         showSwitch: true
         checked: root.powered
@@ -59,7 +61,7 @@ Item {
 
     Flickable {
         x: 14; y: 54
-        width: 332
+        width: root.width - 28
         height: root.height - 54 - 14
         contentHeight: col.implicitHeight
         clip: true

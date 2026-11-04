@@ -65,6 +65,7 @@ function M.apply()
     bind("ALT + W",                qs("wallpaper toggle"))
     bind("ALT + L",                qs("lock lock"))
     bind("ALT + I",                qs("system toggle"))
+    bind("ALT + O",                qs("settings toggle"))
     bind("ALT + TAB",              qs("workspaces peek"))
 
     -- ── Shell: modalità ──

@@ -20,14 +20,14 @@ Singleton {
     readonly property int iconLevel: (kind === "volume" && Audio.muted) ? 0 : (value > 0.5 ? 2 : 1)
 
     function show(k) {
-        if (!armed || UiState.controlOpen || Lid.recent) return
+        if (!armed || !Settings.osdEnabled || UiState.controlOpen || Lid.recent) return
         kind = k
         shown = true
         hideTimer.restart()
     }
 
     Timer { interval: 2000; running: true; onTriggered: root.armed = true }
-    Timer { id: hideTimer; interval: 1500; onTriggered: root.shown = false }
+    Timer { id: hideTimer; interval: Settings.osdMs; onTriggered: root.shown = false }
 
     Connections {
         target: Audio

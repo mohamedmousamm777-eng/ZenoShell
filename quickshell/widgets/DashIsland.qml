@@ -293,7 +293,7 @@ Rectangle {
 
             Text {
                 text: Capture.recording ? Capture.timeText
-                                        : root.two(clock.date.getHours()) + ":" + root.two(clock.date.getMinutes())
+                                        : Qt.formatDateTime(clock.date, Settings.timeFormat)
                 color: Theme.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSize
@@ -473,7 +473,7 @@ Rectangle {
             spacing: 12
 
             Text {
-                text: root.two(clock.date.getHours()) + ":" + root.two(clock.date.getMinutes())
+                text: Qt.formatDateTime(clock.date, Settings.timeFormat)
                 color: Theme.foreground
                 font.family: Theme.fontFamily
                 font.pixelSize: 24
@@ -751,7 +751,7 @@ Rectangle {
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: root.two(clock.date.getHours()) + ":" + root.two(clock.date.getMinutes())
+                    text: Qt.formatDateTime(clock.date, Settings.timeFormat)
                     color: Theme.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: 22

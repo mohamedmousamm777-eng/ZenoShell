@@ -67,6 +67,7 @@ L'ispirazione viene da [SaneAspect](https://www.youtube.com/@saneAspect): sono p
 - **4 stili da cambiare al volo** (`Alt+S` apre il selettore, oppure `Mod+Alt+1..4`): Island, Classic, Dashboard e Vertical. Vedi [Stili](#stili).
 - **Modalità chiaro / scuro** (`Mod+Alt+T`): rigenera la palette pywal con `wal -l`, così shell, kitty e Firefox diventano chiari o scuri insieme.
 - **10 temi per modalità** (`Alt+T`): non toccano pywal, cambiano solo come la shell usa i suoi colori (accento, sfondo, bordi, testo). Leggeri: nessun effetto pesante.
+- **Un vero pannello Impostazioni** (`Alt+O`): un pannello fluttuante al centro dello schermo, sempre della stessa grandezza, con barra laterale. Wi-Fi, Bluetooth, audio e monitor occupano tutta la pagina. Aspetto (stile, versione Dashboard, chiaro/scuro, tema), barra e orologio, notifiche e OSD, sfondo / blocco / inattività (blocco automatico e spegnimento schermo), monitor e schermo, rete, Bluetooth, audio, energia e batteria, scorciatoie, informazioni.
 - Launcher con preferiti, menu power, schermata di blocco, centro notifiche con Non disturbare, calendario con promemoria, timer e cronometro.
 - Impostazioni rapide: Wi-Fi, Bluetooth, audio, schermo, monitor (posizione, scala, rotazione), layout tastiera, Game Mode ed Eco Mode.
 - Selettore di sfondi; i colori di tutta la shell (e di Firefox, con Pywalfox) seguono lo sfondo tramite pywal.
@@ -169,6 +170,9 @@ Solo su Hyprland: `Mod+Tab` fissa i workspace, `Mod+J` cambia split, `Mod+P` pse
 
 ### Una per una
 
+#### `Alt+O` — impostazioni
+Apre il pannello Impostazioni: una scheda fluttuante al centro dello schermo, sempre della stessa grandezza (non diventa mai una finestra accanto alle altre), con le sezioni a sinistra. Si chiude con `Alt+O`, `Esc` o un clic fuori. Per aprire direttamente una sezione: `qs ipc call settings page <nome>` (`appearance`, `bar`, `notifications`, `wallpaper`, `displays`, `network`, `bluetooth`, `audio`, `power`, `keys`, `about`). Quello che cambi lì viene salvato in `~/.local/state/quickshell/`.
+
 #### `Alt+W` — selettore sfondi
 Apre a schermo intero un selettore con le immagini della tua cartella `Wallpapers`. `←` `→` scorrono, `Home` / `End` vanno alla prima / ultima, `Invio` applica, `Esc` chiude. Applicare uno sfondo rigenera la palette pywal, quindi shell, kitty e Firefox lo seguono. Rispetta la modalità chiaro / scuro in uso.
 
@@ -227,6 +231,7 @@ Tutto è anche un comando: `qs ipc call <target> <funzione>`. È anche quello ch
 | `power` | `toggle` `open` `close` |
 | `lock` | `lock` |
 | `wallpaper` | `toggle` |
+| `settings` | `toggle` `open` `close` `page <name>` |
 | `system` | `toggle` `show` `hide` |
 | `workspaces` | `peek` `show` `toggle` |
 | `gamemode` | `toggle` `on` `off` |

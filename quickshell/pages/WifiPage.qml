@@ -7,6 +7,7 @@ Item {
     id: root
 
     signal back()
+    property bool embedded: false      // inside the Settings window: no back arrow
 
     property string asking: ""          // SSID whose password is being asked
     readonly property bool needsKeyboard: asking !== ""
@@ -27,8 +28,9 @@ Item {
     }
 
     PageHeader {
+        showBack: !root.embedded
         x: 14; y: 14
-        width: 332
+        width: root.width - 28
         title: "Wi-Fi"
         showSwitch: true
         checked: Network.wifiOn
@@ -39,7 +41,7 @@ Item {
     // ---------- Active network ----------
     Rectangle {
         x: 14; y: 54
-        width: 332
+        width: root.width - 28
         height: 58
         radius: 16
         color: Theme.surfaceSoft
@@ -128,7 +130,7 @@ Item {
     Item {
         x: 14
         y: Network.connected ? 124 : 60
-        width: 332
+        width: root.width - 28
         height: root.height - y - 14
         visible: Network.wifiOn
 

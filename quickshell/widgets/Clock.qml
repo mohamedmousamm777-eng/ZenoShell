@@ -245,7 +245,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         y: root.expanded ? 14 : (Theme.islandHeight - height) / 2
 
-        text: Qt.formatDateTime(clock.date, "HH:mm")
+        text: Qt.formatDateTime(clock.date, Settings.timeFormat)
         color: Theme.foreground
         font.family: Theme.fontFamily
         font.pixelSize: root.expanded ? 24 : Theme.fontSize

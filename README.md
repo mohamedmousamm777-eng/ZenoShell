@@ -67,6 +67,7 @@ The inspiration comes from [SaneAspect](https://www.youtube.com/@saneAspect): I 
 - **4 styles you can switch live** (`Alt+S` opens the picker, or `Mod+Alt+1..4`): Island, Classic, Dashboard and Vertical. See [Styles](#styles).
 - **Light / Dark mode** (`Mod+Alt+T`): regenerates the pywal palette with `wal -l`, so the shell, kitty and Firefox all go light or dark together.
 - **10 themes per mode** (`Alt+T`): they don't touch pywal, they only change how the shell uses its colors (accent, background, borders, text). Cheap: no heavy effects.
+- **A real Settings panel** (`Alt+O`): a floating panel in the middle of the screen, always the same size, with a sidebar. Wi-Fi, Bluetooth, audio and monitors fill the whole page. Appearance (style, Dashboard version, light/dark, theme), bar and clock, notifications and OSD, wallpaper / lock / idle (auto-lock and screen off), monitors and display, network, Bluetooth, audio, power and battery, shortcuts, about.
 - Launcher with favorites, power menu, lock screen, notification center with Do Not Disturb, calendar with reminders, timer and stopwatch.
 - Quick settings: Wi-Fi, Bluetooth, sound, display, monitors (position, scale, rotation), keyboard layouts, Game Mode and Eco Mode.
 - Wallpaper picker; the colors of the whole shell (and Firefox, with Pywalfox) follow the wallpaper through pywal.
@@ -169,6 +170,9 @@ Only on Hyprland: `Mod+Tab` pin workspaces, `Mod+J` toggle split, `Mod+P` pseudo
 
 ### One by one
 
+#### `Alt+O` — settings
+Opens the Settings panel: a floating card in the middle of the screen, always the same size (it never turns into a window next to the others), with the sections on the left. `Alt+O` again, `Esc` or a click outside closes it. Open a section directly with `qs ipc call settings page <name>` (`appearance`, `bar`, `notifications`, `wallpaper`, `displays`, `network`, `bluetooth`, `audio`, `power`, `keys`, `about`). What you change there is saved in `~/.local/state/quickshell/`.
+
 #### `Alt+W` — wallpaper picker
 Opens a full-screen picker with the images of your `Wallpapers` folder. `←` `→` browse, `Home` / `End` jump to the first / last, `Enter` applies, `Esc` closes. Applying a wallpaper regenerates the pywal palette, so the shell, kitty and Firefox follow it. It respects the current Light / Dark mode.
 
@@ -227,6 +231,7 @@ Everything is also a command: `qs ipc call <target> <function>`. This is also wh
 | `power` | `toggle` `open` `close` |
 | `lock` | `lock` |
 | `wallpaper` | `toggle` |
+| `settings` | `toggle` `open` `close` `page <name>` |
 | `system` | `toggle` `show` `hide` |
 | `workspaces` | `peek` `show` `toggle` |
 | `gamemode` | `toggle` `on` `off` |

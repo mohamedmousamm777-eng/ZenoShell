@@ -96,7 +96,7 @@ Item {
             id: timeText
             width: parent.width
             horizontalAlignment: root.clockLeft ? Text.AlignLeft : Text.AlignRight
-            text: Qt.formatDateTime(clock.date, "HH:mm")
+            text: Qt.formatDateTime(clock.date, Settings.timeFormat)
             color: Theme.foreground
             font.family: Theme.fontFamily
             font.pixelSize: Math.min(240, root.height * 0.27, clockArea.width / 3.05)

@@ -8,18 +8,20 @@ Item {
     property string title: ""
     property bool showSwitch: false
     property bool checked: false
+    property bool showBack: true       // false when the page is inside the Settings window
     signal back()
     signal toggled()
 
     implicitHeight: 28
 
     NavButton {
+        visible: root.showBack
         label: "‹"
         onClicked: root.back()
     }
 
     Text {
-        x: 38
+        x: root.showBack ? 38 : 0
         anchors.verticalCenter: parent.verticalCenter
         text: root.title
         color: Theme.foreground

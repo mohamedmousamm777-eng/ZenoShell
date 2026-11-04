@@ -42,6 +42,16 @@ Scope {
         function onRecMenuOpenChanged() { if (UiState.recMenuOpen) { Appearance.pickerOpen = false; Style.variantOpen = false } }
     }
 
+    // qs ipc call settings toggle | open | close | page appearance|bar|notifications|wallpaper|displays|network|bluetooth|audio|power|keys|about
+    IpcHandler {
+        target: "settings"
+
+        function toggle(): void { Settings.toggle() }
+        function open(): void { Settings.show("") }
+        function close(): void { Settings.open = false }
+        function page(name: string): void { Settings.show(name) }
+    }
+
     // qs ipc call power toggle
     IpcHandler {
         target: "power"

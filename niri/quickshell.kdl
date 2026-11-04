@@ -10,6 +10,7 @@ binds {
     Alt+W         { spawn "qs" "ipc" "call" "wallpaper" "toggle"; }
     Alt+L         { spawn "qs" "ipc" "call" "lock" "lock"; }
     Alt+I         { spawn "qs" "ipc" "call" "system" "toggle"; }
+    Alt+O         { spawn "qs" "ipc" "call" "settings" "toggle"; }
     Alt+Tab       { spawn "qs" "ipc" "call" "workspaces" "peek"; }
 
     // ── Modes ──

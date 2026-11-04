@@ -8,6 +8,7 @@ import qs.lock
 import qs.sysmon
 import qs.widgets
 import qs.hello
+import qs.settings
 
 ShellRoot {
     Bar {}
@@ -20,4 +21,6 @@ ShellRoot {
     Hello {}
     StylePicker {}
     Identify {}
+    SettingsWindow {}
+    IdleWatcher {}
 }

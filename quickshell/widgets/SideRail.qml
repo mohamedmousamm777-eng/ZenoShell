@@ -161,7 +161,7 @@ Item {
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.two(clock.date.getHours())
+                    text: Settings.clock24 ? root.two(clock.date.getHours()) : String(clock.date.getHours() % 12 || 12)
                     color: root.current === "calendar" ? Theme.island : Theme.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: 16
@@ -174,6 +174,16 @@ Item {
                     color: root.current === "calendar" ? Theme.island : Theme.foreground
                     font.family: Theme.fontFamily
                     font.pixelSize: 16
+                    font.bold: true
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: !Settings.clock24
+                    text: clock.date.getHours() < 12 ? "AM" : "PM"
+                    color: root.current === "calendar" ? Theme.island : Theme.muted
+                    font.family: Theme.fontFamily
+                    font.pixelSize: 9
                     font.bold: true
                 }
 

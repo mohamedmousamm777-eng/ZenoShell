@@ -7,12 +7,13 @@ Rectangle {
 
     property var model: []           // [{ id, label }]
     property string current: ""
+    property color base: Theme.island      // color of the track (on a card of the same color, pass another one)
     signal picked(string id)
 
     implicitWidth: row.implicitWidth + 6
     implicitHeight: 30
     radius: 15
-    color: Theme.island
+    color: root.base
 
     Row {
         id: row

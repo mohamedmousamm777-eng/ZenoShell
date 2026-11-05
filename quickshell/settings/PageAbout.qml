@@ -57,6 +57,21 @@ SPage {
     }
 
     SSection {
+        title: "Tour"
+
+        SRow {
+            title: "Welcome tour"
+            hint: "The steps shown the first time: style, colors, clock, network, shortcuts and how the shell works."
+            last: true
+            SButton {
+                label: "Review the tour"
+                accent: true
+                onClicked: Welcome.show()
+            }
+        }
+    }
+
+    SSection {
         title: "Files"
 
         SRow {

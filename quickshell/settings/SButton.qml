@@ -7,13 +7,14 @@ Rectangle {
 
     property string label: ""
     property bool accent: false
+    property color base: Theme.island
     signal clicked()
 
     implicitWidth: text.implicitWidth + 28
     implicitHeight: 30
     radius: 15
     color: accent ? (mouse.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)
-                  : (mouse.containsMouse ? Theme.islandHover : Theme.island)
+                  : (mouse.containsMouse ? Theme.islandHover : root.base)
     Behavior on color { ColorAnimation { duration: 100 } }
 
     Text {

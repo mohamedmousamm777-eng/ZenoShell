@@ -67,6 +67,7 @@ The inspiration comes from [SaneAspect](https://www.youtube.com/@saneAspect): I 
 - **4 styles you can switch live** (`Alt+S` opens the picker, or `Mod+Alt+1..4`): Island, Classic, Dashboard and Vertical. See [Styles](#styles).
 - **Light / Dark mode** (`Mod+Alt+T`): regenerates the pywal palette with `wal -l`, so the shell, kitty and Firefox all go light or dark together.
 - **10 themes per mode** (`Alt+T`): they don't touch pywal, they only change how the shell uses its colors (accent, background, borders, text). Cheap: no heavy effects.
+- **A welcome tour** the first time the shell starts: choose the style, light or dark, theme and wallpaper, the clock, connect Wi-Fi and Bluetooth, set up the monitors, learn the shortcuts with a Try button, and see how the shell works inside. Reopen it from Settings, About, "Review the tour".
 - **A real Settings panel** (`Alt+O`): a floating panel in the middle of the screen, always the same size, with a sidebar. Wi-Fi, Bluetooth, audio and monitors fill the whole page. Appearance (style, Dashboard version, light/dark, theme), bar and clock, notifications and OSD, wallpaper / lock / idle (auto-lock and screen off), monitors and display, network, Bluetooth, audio, power and battery, shortcuts, about.
 - Launcher with favorites, power menu, lock screen, notification center with Do Not Disturb, calendar with reminders, timer and stopwatch.
 - Quick settings: Wi-Fi, Bluetooth, sound, display, monitors (position, scale, rotation), keyboard layouts, Game Mode and Eco Mode.

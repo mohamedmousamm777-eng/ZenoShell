@@ -52,6 +52,12 @@ if [ -z "$nodeps" ]; then
                 ;;
         esac
     fi
+    # Qt Multimedia: only the animated wallpapers (videos) need it; GIFs and everything else work without
+    qtm=""
+    for d in /usr/lib/qt6/qml /usr/lib64/qt6/qml /usr/lib/x86_64-linux-gnu/qt6/qml; do
+        [ -d "$d/QtMultimedia" ] && qtm=1
+    done
+    [ -n "$qtm" ] || say "note: Qt Multimedia not found (package qt6-multimedia): needed only to play video wallpapers"
 else
     step "2/6" "Programs check skipped (--no-deps)"
 fi

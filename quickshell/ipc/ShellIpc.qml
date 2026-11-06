@@ -52,6 +52,20 @@ Scope {
         function page(name: string): void { Settings.show(name) }
     }
 
+    // qs ipc call livewall toggle | on | off   (play / stop the animated wallpaper; the still frame stays)
+    // qs ipc call livewall clear               (forget the animated wallpaper: back to a normal one)
+    // qs ipc call livewall status              (playing, paused or off)
+    IpcHandler {
+        target: "livewall"
+
+        function toggle(): void { Settings.set("liveEnabled", !Settings.liveEnabled) }
+        function on(): void { Settings.set("liveEnabled", true) }
+        function off(): void { Settings.set("liveEnabled", false) }
+        function clear(): void { LiveWall.clear() }
+        function reload(): void { LiveWall.reload() }
+        function status(): string { return LiveWall.statusText }
+    }
+
     // qs ipc call power toggle
     IpcHandler {
         target: "power"

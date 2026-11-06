@@ -26,6 +26,10 @@ Singleton {
     property bool osdEnabled: true
     property int osdMs: 1500                    // how long the OSD stays on screen
 
+    // Animated wallpaper (video / GIF): off = the still frame stays and nothing is decoded
+    property bool liveEnabled: true
+    property bool livePause: true       // smart pause: fullscreen window, lock, Game / Eco Mode, screen off, PC under load
+
     // Lock and inactivity (0 = never)
     property int lockMin: 0
     property int screenOffMin: 0
@@ -37,7 +41,7 @@ Singleton {
         printErrors: false
     }
 
-    readonly property var keys: ["clock24", "weekStart", "osdEnabled", "osdMs", "lockMin", "screenOffMin"]
+    readonly property var keys: ["clock24", "weekStart", "osdEnabled", "osdMs", "lockMin", "screenOffMin", "liveEnabled", "livePause"]
 
     function save() {
         const d = {}
@@ -70,6 +74,8 @@ Singleton {
             if (typeof d.clock24 === "boolean") clock24 = d.clock24
             if (d.weekStart === 0 || d.weekStart === 1) weekStart = d.weekStart
             if (typeof d.osdEnabled === "boolean") osdEnabled = d.osdEnabled
+            if (typeof d.liveEnabled === "boolean") liveEnabled = d.liveEnabled
+            if (typeof d.livePause === "boolean") livePause = d.livePause
             if (typeof d.osdMs === "number" && d.osdMs >= 500 && d.osdMs <= 10000) osdMs = d.osdMs
             if (typeof d.lockMin === "number" && d.lockMin >= 0) lockMin = d.lockMin
             if (typeof d.screenOffMin === "number" && d.screenOffMin >= 0) screenOffMin = d.screenOffMin

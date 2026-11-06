@@ -16,6 +16,7 @@ ShellRoot {
     Osd {}
     LauncherIpc {}
     WallpaperPicker {}
+    LiveWallpaper {}
     ShellIpc {}
     LockScreen {}
     SysPill {}

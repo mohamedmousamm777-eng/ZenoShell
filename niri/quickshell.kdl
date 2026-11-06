@@ -8,6 +8,7 @@ binds {
     Mod+M         { spawn "qs" "ipc" "call" "power" "toggle"; }
     Alt+P         { spawn "qs" "ipc" "call" "power" "toggle"; }
     Alt+W         { spawn "qs" "ipc" "call" "wallpaper" "toggle"; }
+    Alt+Shift+W   { spawn "qs" "ipc" "call" "wallpaper" "video"; }
     Alt+L         { spawn "qs" "ipc" "call" "lock" "lock"; }
     Alt+I         { spawn "qs" "ipc" "call" "system" "toggle"; }
     Alt+O         { spawn "qs" "ipc" "call" "settings" "toggle"; }

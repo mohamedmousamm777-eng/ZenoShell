@@ -4,6 +4,9 @@ step "6/6" "Wallpapers"
 wp=$(sh "$cfg/quickshell/scripts/wallpaper-dir.sh")
 mkdir -p "$wp"
 say "folder: $wp"
+wpv=$(sh "$cfg/quickshell/scripts/wallpaper-dir.sh" video)
+mkdir -p "$wpv"
+say "animated wallpapers (videos, GIFs): $wpv  ->  Alt+Shift+W"
 if [ -d "$here/wallpapers" ] && ls "$here/wallpapers" | grep -qiE '\.(jpe?g|png|webp)$'; then
     cp -n "$here/wallpapers/"* "$wp/" 2>/dev/null || true
     say "copied the wallpapers that come with the shell"

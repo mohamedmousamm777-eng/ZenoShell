@@ -31,6 +31,22 @@ L'ispirazione viene da [SaneAspect](https://www.youtube.com/@saneAspect): sono p
 
 ## Screenshot
 
+### Vertical
+
+<p>
+<img src="docs/side-bar.jpg" alt="Vertical: the bar" width="49%">
+<img src="docs/side-calendar.jpg" alt="Vertical: calendar panel" width="49%">
+<img src="docs/side-music.jpg" alt="Vertical: music panel" width="49%">
+<img src="docs/side-quick.jpg" alt="Vertical: quick settings" width="49%">
+</p>
+
+### Dashboard
+
+<p>
+<img src="docs/dash-peek.jpg" alt="Dashboard: peek" width="49%">
+<img src="docs/dash-open.jpg" alt="Dashboard: open" width="49%">
+</p>
+
 ### Island
 
 <p>
@@ -39,37 +55,11 @@ L'ispirazione viene da [SaneAspect](https://www.youtube.com/@saneAspect): sono p
 <img src="docs/island-quick.jpg" alt="Island: quick settings" width="49%">
 </p>
 
-### Dashboard
-
-<p>
-<img src="docs/dashboard-pill.jpg" alt="Dashboard: closed pill" width="49%">
-<img src="docs/dash-peek.jpg" alt="Dashboard: mouse over" width="49%">
-<img src="docs/dashboard-peek.jpg" alt="Dashboard: mouse over" width="49%">
-<img src="docs/dash-open.jpg" alt="Dashboard: open" width="49%">
-<img src="docs/dashboard-open.jpg" alt="Dashboard: open" width="49%">
-</p>
-
-### Vertical
-
-<p>
-<img src="docs/side-bar.jpg" alt="Vertical: the bar" width="49%">
-<img src="docs/vertical-idle.jpg" alt="Vertical: idle" width="49%">
-<img src="docs/side-calendar.jpg" alt="Vertical: calendar panel" width="49%">
-<img src="docs/vertical-calendar.jpg" alt="Vertical: calendar" width="49%">
-<img src="docs/side-music.jpg" alt="Vertical: music panel" width="49%">
-<img src="docs/vertical-music.jpg" alt="Vertical: music" width="49%">
-<img src="docs/side-quick.jpg" alt="Vertical: quick settings" width="49%">
-<img src="docs/vertical-tools.jpg" alt="Vertical: tools" width="49%">
-<img src="docs/vertical-wifi.jpg" alt="Vertical: Wi-Fi" width="49%">
-</p>
-
 ### Selettori di stile e wallpaper
 
 <p>
 <img src="docs/styles.jpg" alt="Style picker" width="49%">
-<img src="docs/style-picker.jpg" alt="Style picker" width="49%">
 <img src="docs/wallpapers.jpg" alt="Wallpaper picker" width="49%">
-<img src="docs/wallpaper-picker.jpg" alt="Wallpaper picker" width="49%">
 </p>
 
 ## Cosa trovi
@@ -82,6 +72,7 @@ L'ispirazione viene da [SaneAspect](https://www.youtube.com/@saneAspect): sono p
 - Launcher con preferiti, menu power, schermata di blocco, centro notifiche con Non disturbare, calendario con promemoria, timer e cronometro.
 - Impostazioni rapide: Wi-Fi, Bluetooth, audio, schermo, monitor (posizione, scala, rotazione), layout tastiera, Game Mode ed Eco Mode.
 - Selettore di sfondi; i colori di tutta la shell (e di Firefox, con Pywalfox) seguono lo sfondo tramite pywal.
+- **Sfondi animati** (video e GIF) con `Alt+Shift+W`: un secondo selettore, lo stesso carosello, per la cartella `Wallpapers_Video`. Vanno in pausa da soli (finestra a schermo intero, blocco schermo, Game Mode, Eco Mode, schermo spento) e si possono spegnere per risparmiare risorse. Nessun programma in più: li disegna la shell stessa.
 - Screenshot e registrazione dello schermo (con richiesta del nome e scelta dell'audio), lettore musicale con spettro audio in tempo reale.
 - OSD di volume / luminosità che cambia con lo stile (Island: pillola a destra; Classic: pillola in basso; Dashboard: slider verticale, o la barra stessa nella versione Attaccata; Vertical: attaccato al bordo destro con volume e luminosità uno sotto l'altro), cronologia degli appunti.
 
@@ -140,11 +131,15 @@ Ti richiede il tipo di installazione: usa lo stesso di prima. Il backup viene sa
 
 `quickshell`, `awww` (o `swww`), `pywal`, `jq`, `grim`, `slurp`, `wf-recorder`, `ffmpeg`, `wireplumber`, `playerctl`, `brightnessctl`, `cava`, `cliphist`, `wl-mirror`, `imagemagick`, `libnotify`, `inotify-tools`, `xdg-user-dirs`, e in più, se vuoi, `python-pywalfox` (AUR) per Firefox. L'installer lo registra (`pywalfox install`); poi installi una volta l'estensione da [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/pywalfox/). Pywalfox legge i colori che pywal scrive in `~/.cache/wal/`.
 
+Gli sfondi video richiedono Qt Multimedia (`qt6-multimedia`, con il backend FFmpeg); le GIF no. L'installer ti avvisa se manca.
+
 Per Game Mode / Eco Mode il profilo energetico si imposta con `power-profiles-daemon` (`powerprofilesctl`).
 
 ### Wallpaper
 
 Metti le immagini in `<Immagini>/Wallpapers` (ad esempio `~/Immagini/Wallpapers` o `~/Pictures/Wallpapers`, la cartella la crea l'installer), poi premi `Alt+W`.
+
+Per gli sfondi animati metti video (`mp4`, `webm`, `mkv`, `mov`) o GIF in `<Immagini>/Wallpapers_Video`, accanto alla prima cartella, poi premi `Alt+Shift+W`.
 
 ## Stili
 
@@ -201,6 +196,11 @@ Solo su Hyprland: `Mod+Tab` fissa i workspace, `Mod+J` cambia split, `Mod+P` pse
 
 #### `Alt+O` — impostazioni
 Apre il pannello Impostazioni: una scheda fluttuante al centro dello schermo, sempre della stessa grandezza (non diventa mai una finestra accanto alle altre), con le sezioni a sinistra. Si chiude con `Alt+O`, `Esc` o un clic fuori. Per aprire direttamente una sezione: `qs ipc call settings page <nome>` (`appearance`, `bar`, `notifications`, `wallpaper`, `displays`, `network`, `bluetooth`, `audio`, `power`, `keys`, `about`). Quello che cambi lì viene salvato in `~/.local/state/quickshell/`.
+
+#### `Alt+Shift+W` — selettore sfondi animati
+Lo stesso selettore a schermo intero, ma con i video e le GIF della cartella `Wallpapers_Video` (accanto a `Wallpapers`). Le miniature sono fotogrammi fatti con `ffmpeg` la prima volta. Applicarne uno imposta quel fotogramma come sfondo normale (così i colori pywal, il blocco schermo e il cambio chiaro / scuro continuano a funzionare) e fa partire l'animazione sopra, sempre muta. La disegna la shell stessa con Qt, un lettore per monitor, sotto le tue finestre.
+
+Va in **pausa** da sola (il player si ferma e non decodifica nulla) quando una finestra copre il monitor (schermo intero), nel blocco schermo, in Game Mode ed Eco Mode, a schermo spento e quando il PC è in difficoltà (CPU sopra l'85% o RAM sopra il 90% per qualche secondo; riparte quando si calma, mai prima di 20 secondi, così non va avanti e indietro). Le pause sono per monitor dove ha senso: un gioco a schermo intero su uno schermo non ferma l'altro. "Smart pause" nelle Impostazioni spegne tutto questo. Per risparmiare ancora di più spegni l'animazione: Impostazioni, Sfondo, "Play the animated wallpaper", oppure `qs ipc call livewall off`. Il fotogramma fisso resta e non si decodifica nulla. Scegliere uno sfondo normale con `Alt+W` sostituisce quello animato. I video li decodifica Qt Multimedia (pacchetto `qt6-multimedia`; senza, le GIF funzionano comunque e la shell te lo dice nelle Impostazioni), quindi con video pesanti la CPU può salire più che con un player dedicato: l'interruttore e la pausa per carico servono a questo.
 
 #### `Alt+W` — selettore sfondi
 Apre a schermo intero un selettore con le immagini della tua cartella `Wallpapers`. `←` `→` scorrono, `Home` / `End` vanno alla prima / ultima, `Invio` applica, `Esc` chiude. Applicare uno sfondo rigenera la palette pywal, quindi shell, kitty e Firefox lo seguono. Rispetta la modalità chiaro / scuro in uso.
@@ -259,7 +259,8 @@ Tutto è anche un comando: `qs ipc call <target> <funzione>`. È anche quello ch
 | `launcher` | `toggle` `open` `close` |
 | `power` | `toggle` `open` `close` |
 | `lock` | `lock` |
-| `wallpaper` | `toggle` |
+| `wallpaper` | `toggle` `open` `video` `openvideo` |
+| `livewall` (sfondo animato) | `toggle` `on` `off` `clear` `status` |
 | `settings` | `toggle` `open` `close` `page <name>` |
 | `system` | `toggle` `show` `hide` |
 | `workspaces` | `peek` `show` `toggle` |

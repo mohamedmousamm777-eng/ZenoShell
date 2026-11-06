@@ -11,6 +11,7 @@ Singleton {
 
     property bool wallpaperOpen: false
     property string wallpaperScreen: ""
+    property bool wallpaperLive: false       // the picker shows the animated wallpapers (Wallpapers_Video)
 
     property bool powerOpen: false
     property string powerScreen: ""

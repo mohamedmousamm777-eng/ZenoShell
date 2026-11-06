@@ -11,12 +11,49 @@ Scope {
     id: root
 
     // <Pictures>/Wallpapers (Pictures / Immagini / ... depending on the system language)
-    property string dir: ""
+    // and, next to it, <Pictures>/Wallpapers_Video for the animated ones (videos and GIFs)
+    property string dirImg: ""
+    property string dirVid: ""
+
+    // The picker shows the animated wallpapers (qs ipc call wallpaper video)
+    readonly property bool live: UiState.wallpaperLive
+    readonly property string dir: live ? dirVid : dirImg
 
     Process {
         running: true
         command: ["sh", Quickshell.shellPath("scripts/wallpaper-dir.sh")]
-        stdout: StdioCollector { onStreamFinished: { const d = text.trim(); if (d !== "") root.dir = d } }
+        stdout: StdioCollector { onStreamFinished: { const d = text.trim(); if (d !== "") root.dirImg = d } }
+    }
+
+    Process {
+        running: true
+        command: ["sh", Quickshell.shellPath("scripts/wallpaper-dir.sh"), "video"]
+        stdout: StdioCollector { onStreamFinished: { const d = text.trim(); if (d !== "") root.dirVid = d } }
+    }
+
+    // Still frames of the animated wallpapers (made with ffmpeg by live-thumbs.sh)
+    readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/quickshell-live/thumbs"
+    property var thumbs: ({})            // file name -> true, as the frames get ready
+
+    function thumbUrl(name) {
+        return thumbs[name] ? "file://" + thumbDir + "/" + encodeURIComponent(name) + ".jpg" : ""
+    }
+
+    Process {
+        id: thumbProc
+        command: ["sh", Quickshell.shellPath("scripts/live-thumbs.sh"), root.dirVid]
+
+        stdout: SplitParser {
+            onRead: line => {
+                if (line === "") return
+                const t = Object.assign({}, root.thumbs)
+                t[line] = true
+                root.thumbs = t
+            }
+        }
+
+        // the colors are taken from the frames, so they come last
+        onExited: if (root.live) root.startPalettes()
     }
 
     property int index: 0
@@ -24,31 +61,51 @@ Scope {
     property var palettes: ({})          // percorso -> [5 colori]
 
     readonly property int count: folder.count
-    readonly property url currentUrl: folder.count > 0 ? folder.get(index, "fileUrl") : ""
+    readonly property url currentUrl: folder.count > 0
+        ? (live ? thumbUrl(currentName) : folder.get(index, "fileUrl")) : ""
     readonly property string currentName: folder.count > 0 ? folder.get(index, "fileName") : ""
 
     // ---------- Images in the folder ----------
     FolderListModel {
         id: folder
         folder: root.dir !== "" ? "file://" + root.dir : ""
-        nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
+        nameFilters: root.live ? ["*.mp4", "*.webm", "*.mkv", "*.mov", "*.gif"]
+                               : ["*.jpg", "*.jpeg", "*.png", "*.webp"]
         caseSensitive: false
         showDirs: false
         sortField: FolderListModel.Name
         onCountChanged: if (root.index >= count) root.index = Math.max(0, count - 1)
     }
 
-    // Current wallpaper (written by apply-wallpaper.sh)
+    // Current wallpaper (written by apply-wallpaper.sh) and current animated one (apply-live.sh)
     FileView {
         id: cur
         path: Quickshell.env("HOME") + "/.cache/quickshell-wallpaper-current"
         blockLoading: true
     }
 
+    FileView {
+        id: curLive
+        path: Quickshell.env("HOME") + "/.cache/quickshell-live-current"
+        blockLoading: true
+        printErrors: false
+    }
+
     // ---------- Palette of each wallpaper (row by row, as they arrive) ----------
+    // Starts the colors of the current folder; if a run is going (maybe for the other folder), it is repeated after it
+    property string palDir: ""
+    property bool palAgain: false
+    function startPalettes() {
+        if (palProc.running) { palAgain = true; return }
+        palDir = live ? thumbDir : dirImg
+        palProc.running = true
+    }
+
     Process {
         id: palProc
-        command: ["sh", Quickshell.shellPath("scripts/palettes.sh"), root.dir]
+        // for the animated ones the colors come from their still frames
+        command: ["sh", Quickshell.shellPath("scripts/palettes.sh"), root.palDir]
+        onExited: if (root.palAgain) { root.palAgain = false; root.palDir = root.live ? root.thumbDir : root.dirImg; running = true }
 
         stdout: SplitParser {
             onRead: line => {
@@ -68,8 +125,11 @@ Scope {
 
     // ---------- Logica ----------
     function prepare() {
-        cur.reload()
-        const c = (cur.text() || "").trim()
+        let c = ""
+        try {
+            if (live) { curLive.reload(); c = (curLive.text() || "").trim() }
+            else { cur.reload(); c = (cur.text() || "").trim() }
+        } catch (e) {}
         currentPath = c
 
         let idx = 0
@@ -78,15 +138,28 @@ Scope {
         }
         index = idx
 
-        if (!palProc.running) palProc.running = true
+        if (live) {
+            // the folder is made if it does not exist yet; the frames first, then the colors
+            Quickshell.execDetached(["mkdir", "-p", dirVid])
+            if (!thumbProc.running) thumbProc.running = true
+        } else {
+            root.startPalettes()
+        }
     }
 
-    function open() {
+    function open(liveMode) {
+        UiState.wallpaperLive = !!liveMode
         UiState.wallpaperScreen = Compositor.focusedMonitor
         UiState.launcherOpen = false
         UiState.powerOpen = false
         prepare()
         UiState.wallpaperOpen = true
+    }
+
+    // the same key closes the picker it opened; the other one switches to its own folder
+    function toggleMode(liveMode) {
+        if (UiState.wallpaperOpen && UiState.wallpaperLive === liveMode) UiState.wallpaperOpen = false
+        else open(liveMode)
     }
 
     function move(d) {
@@ -98,20 +171,27 @@ Scope {
         if (i < 0 || i >= folder.count) return
         const path = folder.get(i, "filePath")
         currentPath = path
-        Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/apply-wallpaper.sh"), path])
+        if (live) {
+            Settings.set("liveEnabled", true)       // choosing one means you want to see it
+            Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/apply-live.sh"), path])
+        } else {
+            Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/apply-wallpaper.sh"), path])
+        }
         UiState.wallpaperOpen = false
     }
 
-    // ---------- Comando IPC: qs ipc call wallpaper toggle ----------
+    // ---------- Comando IPC: qs ipc call wallpaper toggle | video ----------
+    // video: the same picker with the animated wallpapers of the Wallpapers_Video folder
     IpcHandler {
         target: "wallpaper"
 
-        function toggle(): void {
-            if (UiState.wallpaperOpen) UiState.wallpaperOpen = false
-            else root.open()
-        }
+        function toggle(): void { root.toggleMode(false) }
 
-        function open(): void { root.open() }
+        function open(): void { root.open(false) }
+
+        function video(): void { root.toggleMode(true) }
+
+        function openvideo(): void { root.open(true) }
 
         function close(): void { UiState.wallpaperOpen = false }
     }
@@ -251,7 +331,7 @@ Scope {
                     Text {
                         anchors.centerIn: parent
                         visible: root.count === 0
-                        text: "No wallpapers in " + root.dir
+                        text: root.live ? "No videos or GIFs in " + root.dir : "No wallpapers in " + root.dir
                         color: Theme.muted
                         font.family: Theme.fontFamily
                         font.pixelSize: 14
@@ -273,7 +353,8 @@ Scope {
                     anchors.right: previewCard.right
                     anchors.rightMargin: 6
                     y: previewCard.y + previewCard.height + 16
-                    text: (root.count > 0 ? (root.index + 1) + "/" + root.count + "  ·  " : "")
+                    text: (root.live ? "Animated  ·  " : "")
+                          + (root.count > 0 ? (root.index + 1) + "/" + root.count + "  ·  " : "")
                           + "← → browse  ·  Enter apply  ·  Esc close"
                     color: Theme.muted
                     font.family: Theme.fontFamily
@@ -305,11 +386,12 @@ Scope {
 
                         required property int index
                         required property string filePath
+                        required property string fileName
                         required property url fileUrl
 
                         readonly property bool sel: ListView.isCurrentItem
                         readonly property bool isCurrent: filePath === root.currentPath
-                        readonly property var pal: root.palettes[filePath]
+                        readonly property var pal: root.palettes[root.live ? root.thumbDir + "/" + fileName + ".jpg" : filePath]
 
                         width: 134
                         height: 130
@@ -334,7 +416,7 @@ Scope {
                                 Image {
                                     x: 0; y: 0
                                     width: 100; height: 100
-                                    source: card.fileUrl
+                                    source: root.live ? root.thumbUrl(card.fileName) : card.fileUrl
                                     sourceSize: Qt.size(240, 240)
                                     fillMode: Image.PreserveAspectCrop
                                     asynchronous: true

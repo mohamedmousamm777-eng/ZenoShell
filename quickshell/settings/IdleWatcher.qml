@@ -16,6 +16,7 @@ Scope {
         enabled: Settings.screenOffMin > 0
         timeout: Settings.screenOffMin * 60
         onIsIdleChanged: {
+            LiveWall.screenOff = isIdle
             if (Compositor.isHyprland)
                 Quickshell.execDetached(["hyprctl", "dispatch", "dpms", isIdle ? "off" : "on"])
             else if (Compositor.isNiri && isIdle)

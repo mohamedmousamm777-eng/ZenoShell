@@ -17,6 +17,7 @@ WStep {
             { keys: "Mod+R  or  Alt+R", what: "Launcher: type to search apps, Enter opens", cmd: ["launcher", "toggle"], menu: true },
             { keys: "Mod+M  or  Alt+P", what: "Power menu: lock, log out, suspend, reboot, power off", cmd: ["power", "toggle"], menu: true },
             { keys: "Alt+W", what: "Wallpaper picker", cmd: ["wallpaper", "toggle"], menu: true },
+            { keys: "Alt+Shift+W", what: "Animated wallpaper picker (videos and GIFs)", cmd: ["wallpaper", "video"], menu: true },
             { keys: "Alt+I", what: "System resources: CPU, RAM, disk", cmd: ["system", "toggle"], menu: false },
             { keys: "Alt+O", what: "Settings" },
             { keys: "Alt+L", what: "Lock the screen" }

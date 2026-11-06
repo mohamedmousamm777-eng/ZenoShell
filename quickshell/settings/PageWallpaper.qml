@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.theme
 import qs.services
+import qs.widgets
 
 SPage {
     title: "Wallpaper, lock & idle"
@@ -18,6 +19,48 @@ SPage {
                 label: "Open picker"
                 accent: true
                 onClicked: Quickshell.execDetached(["qs", "ipc", "call", "wallpaper", "toggle"])
+            }
+        }
+    }
+
+    SSection {
+        title: "Animated wallpaper"
+
+        SRow {
+            title: "Play the animated wallpaper"
+            hint: "Turn it off to save CPU and battery: the still frame stays and nothing is decoded.  Now: " + LiveWall.statusText
+            Toggle {
+                checked: Settings.liveEnabled
+                onToggled: Settings.set("liveEnabled", !Settings.liveEnabled)
+            }
+        }
+
+        SRow {
+            title: "Smart pause"
+            hint: "Pauses by itself (nothing is decoded) with a fullscreen window, on the lock screen, in Game Mode and Eco Mode, when the screen is off, and when the PC is struggling (CPU or RAM very high). It starts again when things calm down."
+            Toggle {
+                checked: Settings.livePause
+                onToggled: Settings.set("livePause", !Settings.livePause)
+            }
+        }
+
+        SRow {
+            title: "Choose an animated wallpaper"
+            hint: "Videos and GIFs from the Wallpapers_Video folder, next to Wallpapers. Always muted. Also with Alt+Shift+W."
+            SButton {
+                label: "Open picker"
+                accent: true
+                onClicked: Quickshell.execDetached(["qs", "ipc", "call", "wallpaper", "video"])
+            }
+        }
+
+        SRow {
+            last: true
+            title: "Back to a still wallpaper"
+            hint: "Forgets the animated one and keeps its still frame. Choosing an image with Alt+W does the same."
+            SButton {
+                label: "Stop"
+                onClicked: Quickshell.execDetached(["qs", "ipc", "call", "livewall", "clear"])
             }
         }
     }

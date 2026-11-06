@@ -30,6 +30,9 @@ Singleton {
     // Keyboard layout switch (niri only: for Hyprland KbLayout handles it with its events)
     signal kbChanged()
 
+    // A window or workspace changed (niri; on Hyprland use Hyprland.rawEvent): used to pause the animated wallpaper
+    signal layoutEvent()
+
     // ---- niri: state read with "niri msg --json" ----
     property var niriWorkspaces: []
     readonly property var niriFocused: {
@@ -229,6 +232,7 @@ Singleton {
         if (!m) return
         if (niriWsEvents[m[1]]) refreshTimer.restart()
         else if (m[1].indexOf("KeyboardLayout") === 0) kbChanged()
+        if (m[1].indexOf("Window") === 0 || m[1].indexOf("Workspace") === 0) layoutEvent()
     }
 
     Process {

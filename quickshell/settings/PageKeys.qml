@@ -10,7 +10,7 @@ SPage {
     readonly property var groups: [
         { name: "Launch", keys: [
             ["Mod+R  /  Alt+R", "Launcher"], ["Mod+M  /  Alt+P", "Power menu"], ["Alt+L", "Lock the screen"],
-            ["Alt+O", "These settings"], ["Alt+W", "Wallpaper picker"], ["Alt+I", "System resources"] ] },
+            ["Alt+O", "These settings"], ["Alt+W", "Wallpaper picker"], ["Alt+Shift+W", "Animated wallpaper picker"], ["Alt+I", "System resources"] ] },
         { name: "Look", keys: [
             ["Alt+S", "Style picker"], ["Mod+Alt+1 … 4", "Island, Classic, Dashboard, Vertical"], ["Alt+T", "Theme picker"],
             ["Mod+Alt+T", "Light / dark"], ["Alt+V", "Dashboard version"] ] },

@@ -173,8 +173,10 @@ Scope {
         currentPath = path
         if (live) {
             Settings.set("liveEnabled", true)       // choosing one means you want to see it
+            LiveWall.path = path                    // the shell knows it right away (the script also writes it)
             Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/apply-live.sh"), path])
         } else {
+            LiveWall.clear()                        // a normal wallpaper replaces the animated one: stop the video now
             Quickshell.execDetached(["sh", Quickshell.shellPath("scripts/apply-wallpaper.sh"), path])
         }
         UiState.wallpaperOpen = false

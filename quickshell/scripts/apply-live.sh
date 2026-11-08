@@ -7,12 +7,17 @@
 f="$1"
 [ -f "$f" ] || exit 1
 here=$(dirname "$0")
-shelldir=$(cd "$here/.." && pwd)
 cache="$HOME/.cache/quickshell-live"
 th="$cache/thumbs/$(basename "$f").jpg"
 
 sh "$here/live-thumbs.sh" "$f" >/dev/null       # the picker thumbnail (also a fallback)
-[ -s "$th" ] || exit 1
+if [ ! -s "$th" ]; then
+    # no ffmpeg (or it failed): a GIF can be its own still image, a video cannot
+    case $(printf '%s' "${f##*.}" | tr 'A-Z' 'a-z') in
+        gif) th="$f" ;;
+        *) exit 1 ;;
+    esac
+fi
 
 # full-size frame; one file per video, so awww and the restore at login always find it
 key=$(printf '%s' "$f" | md5sum | cut -d' ' -f1)
@@ -25,5 +30,5 @@ fi
 [ -s "$frame" ] || frame="$th"
 
 printf '%s' "$f" > "$HOME/.cache/quickshell-live-current"
-qs -p "$shelldir" ipc call livewall reload >/dev/null 2>&1     # the video starts right away
+qs ipc call livewall reload >/dev/null 2>&1     # the video starts right away
 QS_KEEP_LIVE=1 sh "$here/apply-wallpaper.sh" "$frame"

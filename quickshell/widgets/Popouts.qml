@@ -50,11 +50,22 @@ Item {
         "power":     [470, 190],
         "theme":     [700, 184],
         "capture":   [470, 196],
-        "record":    [360, Math.max(200, Math.round(recordPanel.implicitHeight))],
-        "naming":    [380, Math.round(namingPanel.implicitHeight)]
+        "record":    [360, Math.max(200, Math.round(recordPanel.itemImplicitHeight))],
+        "naming":    [380, Math.round(namingPanel.itemImplicitHeight)]
     })
 
     property var lastSize: [340, 330]
+
+    // These two panels have the height of their content: the page is made when it opens, so the size is
+    // taken again as soon as it exists
+    Connections {
+        target: recordPanel
+        function onLoaded() { if (root.current === "record") root.lastSize = root.sizes["record"] }
+    }
+    Connections {
+        target: namingPanel
+        function onLoaded() { if (root.current === "naming") root.lastSize = root.sizes["naming"] }
+    }
 
     function open(name, cy) {
         anchorY = cy
@@ -338,131 +349,195 @@ Item {
             height: panelBox.height
             clip: true
 
-            CalendarPanel {
+            Lazy {
                 id: calendarPanel
-                opacity: root.current === "calendar" ? 1 : 0
+                wanted: root.current === "calendar"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: CalendarPanel {
+                }
             }
 
-            MusicPanel {
-                opacity: root.current === "media" ? 1 : 0
+            Lazy {
+                wanted: root.current === "media"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: MusicPanel {
+                }
             }
 
-            NotifPanel {
-                opacity: root.current === "notifs" ? 1 : 0
+            Lazy {
+                wanted: root.current === "notifs"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: NotifPanel {
+                }
             }
 
-            QuickPanel {
+            Lazy {
                 id: quickPanel
-                opacity: root.current === "quick" ? 1 : 0
+                wanted: root.current === "quick"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onOpenPanel: name => root.open(name, root.anchorY)
+
+                sourceComponent: QuickPanel {
+                    onOpenPanel: name => root.open(name, root.anchorY)
+                }
             }
 
-            ToolsPage {
+            Lazy {
                 id: toolsPage
-                opacity: root.current === "tools" ? 1 : 0
+                wanted: root.current === "tools"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onBack: root.close()
-                onPasted: root.close()
+
+                sourceComponent: ToolsPage {
+                    onBack: root.close()
+                    onPasted: root.close()
+                }
             }
 
-            WifiPage {
+            Lazy {
                 id: wifiPage
-                opacity: root.current === "wifi" ? 1 : 0
+                wanted: root.current === "wifi"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onBack: root.close()
+
+                sourceComponent: WifiPage {
+                    onBack: root.close()
+                }
             }
 
-            BluetoothPage {
+            Lazy {
                 id: btPage
-                opacity: root.current === "bluetooth" ? 1 : 0
+                wanted: root.current === "bluetooth"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onBack: root.close()
+
+                sourceComponent: BluetoothPage {
+                    onBack: root.close()
+                }
             }
 
-            SoundPage {
+            Lazy {
                 id: soundPage
-                opacity: root.current === "sound" ? 1 : 0
+                wanted: root.current === "sound"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onBack: root.close()
+
+                sourceComponent: SoundPage {
+                    onBack: root.close()
+                }
             }
 
-            DisplayPage {
+            Lazy {
                 id: displayPage
-                opacity: root.current === "display" ? 1 : 0
+                wanted: root.current === "display"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onBack: root.close()
+
+                sourceComponent: DisplayPage {
+                    onBack: root.close()
+                }
             }
 
-            LauncherView {
+            Lazy {
                 id: launcherPanel
-                width: 480; height: 380
-                opacity: root.current === "launcher" ? 1 : 0
+                wanted: root.current === "launcher"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onCloseRequested: UiState.launcherOpen = false
+
+                sourceComponent: LauncherView {
+                    width: 480; height: 380
+                    onCloseRequested: UiState.launcherOpen = false
+                }
             }
 
-            PowerView {
+            Lazy {
                 id: powerPanel
-                width: 470; height: 190
-                opacity: root.current === "power" ? 1 : 0
+                wanted: root.current === "power"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: PowerView {
+                    width: 470; height: 190
+                }
             }
 
-            ThemeView {
+            Lazy {
                 id: themePanel
-                width: 700; height: 184
-                opacity: root.current === "theme" ? 1 : 0
+                wanted: root.current === "theme"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: ThemeView {
+                    width: 700; height: 184
+                }
             }
 
-            CaptureView {
+            Lazy {
                 id: capturePanel
-                width: 470; height: 196
-                opacity: root.current === "capture" ? 1 : 0
+                wanted: root.current === "capture"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: CaptureView {
+                    width: 470; height: 196
+                }
             }
 
-            RecordView {
+            Lazy {
                 id: recordPanel
-                width: 360
-                height: implicitHeight
-                opacity: root.current === "record" ? 1 : 0
+                wanted: root.current === "record"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: RecordView {
+                    width: 360
+                    height: implicitHeight
+                }
             }
 
-            NameView {
+            Lazy {
                 id: namingPanel
-                width: 380
-                height: implicitHeight
-                opacity: root.current === "naming" ? 1 : 0
+                wanted: root.current === "naming"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: NameView {
+                    width: 380
+                    height: implicitHeight
+                }
             }
 
-            MonitorsPage {
+            Lazy {
                 id: monitorsPage
-                opacity: root.current === "monitors" ? 1 : 0
+                wanted: root.current === "monitors"
+                opacity: wanted ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: 160 } }
-                onOpenPage: name => root.open(name, root.anchorY)
+
+                sourceComponent: MonitorsPage {
+                    onOpenPage: name => root.open(name, root.anchorY)
+                }
             }
         }
     }

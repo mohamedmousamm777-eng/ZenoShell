@@ -9,6 +9,7 @@ mkdir -p "$out"
 one() {
     f="$1"
     [ -f "$f" ] || return
+    command -v ffmpeg >/dev/null 2>&1 || return      # without ffmpeg: no frames (GIFs are shown by the picker itself)
     name=$(basename "$f")
     th="$out/$name.jpg"
     if [ ! -s "$th" ] || [ "$f" -nt "$th" ]; then
@@ -21,10 +22,13 @@ one() {
 
 if [ -d "$1" ]; then
     for f in "$1"/*; do
-        case "$f" in
-            *.mp4|*.webm|*.mkv|*.mov|*.gif|*.MP4|*.WEBM|*.MKV|*.MOV|*.GIF) one "$f" ;;
+        [ -f "$f" ] || continue
+        # the extension in any case (.gif, .GIF, .Gif ...)
+        case $(printf '%s' "${f##*.}" | tr 'A-Z' 'a-z') in
+            mp4|webm|mkv|mov|gif) one "$f" ;;
         esac
     done
 else
     one "$1"
 fi
+exit 0

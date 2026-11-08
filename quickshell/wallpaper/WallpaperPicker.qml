@@ -35,8 +35,11 @@ Scope {
     readonly property string thumbDir: Quickshell.env("HOME") + "/.cache/quickshell-live/thumbs"
     property var thumbs: ({})            // file name -> true, as the frames get ready
 
+    // The frame made by ffmpeg. A GIF without one (ffmpeg missing or failed) is shown as it is: Qt reads its first frame.
     function thumbUrl(name) {
-        return thumbs[name] ? "file://" + thumbDir + "/" + encodeURIComponent(name) + ".jpg" : ""
+        if (thumbs[name]) return "file://" + thumbDir + "/" + encodeURIComponent(name) + ".jpg"
+        if (/\.gif$/i.test(name)) return "file://" + dirVid + "/" + encodeURIComponent(name)
+        return ""
     }
 
     Process {
@@ -199,8 +202,34 @@ Scope {
     }
 
     // ---------- Full-screen overlay ----------
+    // The windows exist only while the picker is open (and for the fade out): when it is closed it costs no memory
+    property bool alive: false
+    property var screensNow: []
+    readonly property bool wantOpen: UiState.wallpaperOpen
+
+    function sync() {
+        if (wantOpen) {
+            const a = []
+            for (let i = 0; i < Quickshell.screens.length; i++) {
+                const s = Quickshell.screens[i]
+                if (UiState.wallpaperScreen === "" || UiState.wallpaperScreen === s.name) a.push(s)
+            }
+            const key = x => x.map(s => s.name).join(",")
+            if (key(a) !== key(screensNow)) screensNow = a
+            killTimer.stop()
+            alive = true
+        } else {
+            killTimer.restart()
+        }
+    }
+
+    onWantOpenChanged: sync()
+    Component.onCompleted: sync()
+
+    Timer { id: killTimer; interval: 600; onTriggered: root.alive = false }
+
     Variants {
-        model: Quickshell.screens
+        model: root.alive ? root.screensNow : []
 
         PanelWindow {
             id: win
@@ -221,18 +250,26 @@ Scope {
             WlrLayershell.namespace: "shell-wallpaper"
             WlrLayershell.keyboardFocus: win.here ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-            onHereChanged: {
-                if (here) {
-                    previewCard.show(root.currentUrl)
-                    content.forceActiveFocus()
-                }
+            // Created already open: the fade-in starts one tick later, otherwise there would be nothing to animate
+            property bool appeared: false
+            readonly property bool shown: here && appeared
+
+            function enter() {
+                previewCard.show(root.currentUrl)
+                content.forceActiveFocus()
             }
+
+            onHereChanged: if (here) enter()
+            Component.onCompleted: Qt.callLater(() => {
+                win.appeared = true
+                if (win.here) win.enter()
+            })
 
             Item {
                 id: content
 
                 anchors.fill: parent
-                opacity: win.here ? 1 : 0
+                opacity: win.shown ? 1 : 0
                 focus: true
                 Behavior on opacity { NumberAnimation { duration: 220 } }
 
@@ -284,7 +321,7 @@ Scope {
                     color: Theme.island
                     border.width: 1
                     border.color: Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.18)
-                    scale: win.here ? 1 : 0.94
+                    scale: win.shown ? 1 : 0.94
                     Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
 
                     property url shown: ""

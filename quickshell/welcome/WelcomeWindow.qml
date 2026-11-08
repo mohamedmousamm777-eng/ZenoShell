@@ -10,8 +10,36 @@ import qs.settings
 Scope {
     id: root
 
+    // The windows exist only while the tour is open (and for the fade out): when it is closed it costs no memory
+    property bool alive: false
+    property var screensNow: []
+
+    function sync() {
+        if (Welcome.open) {
+            const a = []
+            for (let i = 0; i < Quickshell.screens.length; i++) {
+                const s = Quickshell.screens[i]
+                if (Welcome.screenName === "" || Welcome.screenName === s.name) a.push(s)
+            }
+            const key = x => x.map(s => s.name).join(",")
+            if (key(a) !== key(screensNow)) screensNow = a
+            killTimer.stop()
+            alive = true
+        } else {
+            killTimer.restart()
+        }
+    }
+
+    Connections {
+        target: Welcome
+        function onOpenChanged() { root.sync() }
+    }
+    Component.onCompleted: sync()
+
+    Timer { id: killTimer; interval: 900; onTriggered: root.alive = false }
+
     Variants {
-        model: Quickshell.screens
+        model: root.alive ? root.screensNow : []
 
         PanelWindow {
             id: win
@@ -32,13 +60,21 @@ Scope {
             WlrLayershell.namespace: "shell-welcome"
             WlrLayershell.keyboardFocus: win.here ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
+            // Created already open: the fade-in starts one tick later, otherwise there would be nothing to animate
+            property bool appeared: false
+            readonly property bool shown: here && appeared
+
             onHereChanged: if (here) keys.forceActiveFocus()
+            Component.onCompleted: Qt.callLater(() => {
+                win.appeared = true
+                if (win.here) keys.forceActiveFocus()
+            })
 
             // A soft veil: the changes you make (style, colors) stay visible behind the card
             Rectangle {
                 anchors.fill: parent
                 color: Qt.rgba(0, 0, 0, 0.38)
-                opacity: win.here ? 1 : 0
+                opacity: win.shown ? 1 : 0
                 Behavior on opacity { NumberAnimation { duration: 260 } }
             }
 
@@ -68,8 +104,8 @@ Scope {
                 border.width: 1
                 border.color: Theme.border
                 clip: true
-                opacity: win.here ? 1 : 0
-                scale: win.here ? 1 : 0.94
+                opacity: win.shown ? 1 : 0
+                scale: win.shown ? 1 : 0.94
                 Behavior on opacity { NumberAnimation { duration: 220 } }
                 Behavior on scale { NumberAnimation { duration: 320; easing.type: Easing.OutBack; easing.overshoot: 1.4 } }
 

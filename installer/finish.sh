@@ -32,11 +32,11 @@ fi
 ok_auto=1
 if [ -n "$want_niri" ]; then
     grep -hqE 'spawn(-sh)?-at-startup[^\n]*"(quickshell|qs)"' "$cfg"/niri/*.kdl 2>/dev/null || {
-        ok_auto=""; say "WARNING: niri does not start the shell. Add to config.kdl:  spawn-at-startup \"quickshell\""; }
+        ok_auto=""; say "WARNING: niri does not start the shell. Add to config.kdl:  spawn-at-startup \"quickshell\" \"-n\""; }
 fi
 if [ -n "$want_hypr" ] && [ -z "$hypr_skipped_all" ]; then
-    grep -hqE 'exec_cmd\("(quickshell|qs)"\)' "$cfg"/hypr/*.lua 2>/dev/null || {
-        ok_auto=""; say "WARNING: Hyprland does not start the shell. Add in hl.on(\"hyprland.start\"):  hl.exec_cmd(\"qs\")"; }
+    grep -hqE 'exec_cmd\("(quickshell|qs)( -n)?"\)' "$cfg"/hypr/*.lua 2>/dev/null || {
+        ok_auto=""; say "WARNING: Hyprland does not start the shell. Add in hl.on(\"hyprland.start\"):  hl.exec_cmd(\"qs -n\")"; }
 fi
 [ -n "$ok_auto" ] && say "autostart: ok (the shell starts by itself at every login)"
 
@@ -57,7 +57,7 @@ if [ -n "$WAYLAND_DISPLAY" ] && { [ -n "$NIRI_SOCKET" ] || [ -n "$HYPRLAND_INSTA
     case "$r" in
         n|N) ;;
         *) pkill -x quickshell 2>/dev/null || true; sleep 0.5
-           setsid qs >/dev/null 2>&1 &
+           setsid qs -n >/dev/null 2>&1 &      # -n: never start a second copy of the shell
            say "shell started" ;;
     esac
 fi
@@ -65,4 +65,4 @@ fi
 printf '\n\033[1mDone.\033[0m Now reload:\n'
 [ -n "$want_niri" ] && say "niri:     niri msg action load-config-file"
 [ -n "$want_hypr" ] && say "Hyprland: hyprctl reload"
-say "shell:    qs kill; qs   (if it is not already running)"
+say "shell:    qs kill; sleep 1; qs -n -d   (-n: does nothing if the shell is already running)"

@@ -123,6 +123,10 @@ sh install.sh
 
 It asks the install type again; use the same one as before. A backup is saved every time. In Light mode your config is never replaced; in Full mode it asks before replacing `config.kdl` / `hyprland.lua`, and if you answer `n` you keep your file (then new shortcuts only arrive if your file includes `quickshell.kdl` / `quickshell-binds.lua`).
 
+#### Starting and restarting the shell
+
+Start it with `qs -n -d` and restart it with `qs kill; sleep 1; qs -n -d`. Plain `qs` does **not** check whether the shell is already running: every `qs` you type starts one more complete copy (two bars, two notification servers). The `-n` flag means "do nothing if it is already running", and the autostart lines of this repo already use it (`spawn-at-startup "quickshell" "-n"` on niri, `hl.exec_cmd("qs -n")` on Hyprland). If you installed an older version, change that line in your config by hand. If you ever see double, `qs list` shows the running copies and `qs kill` closes them all.
+
 ### Uninstalling
 
 `sh install.sh --uninstall` removes the marked block from your `config.kdl` / `hyprland.lua` and moves `~/.config/quickshell` to the backup. If you used Full mode, restore your old config from `~/.config/quickshell-backup-DATE`.

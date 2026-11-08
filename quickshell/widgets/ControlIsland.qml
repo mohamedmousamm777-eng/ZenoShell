@@ -240,66 +240,94 @@ Rectangle {
     }
 
     // ---------- Pages (cross-fade) ----------
-    MainPage {
+    Lazy {
         id: mainPage
-        y: root.headerH
-        height: root.baseMainH
-        opacity: (root.expanded && root.page === "main") ? 1 : 0
+        wanted: (root.expanded && root.page === "main")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onOpenPage: name => root.page = name
-        onPowerRequested: { root.expanded = false; Power.open() }
+
+        sourceComponent: MainPage {
+            y: root.headerH
+            height: root.baseMainH
+            onOpenPage: name => root.page = name
+            onPowerRequested: { root.expanded = false; Power.open() }
+        }
     }
 
-    ToolsPage {
+    Lazy {
         id: toolsPage
-        y: -10
-        opacity: (root.expanded && root.page === "tools") ? 1 : 0
+        wanted: (root.expanded && root.page === "tools")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "main"
-        onPasted: root.expanded = false
+
+        sourceComponent: ToolsPage {
+            y: -10
+            onBack: root.page = "main"
+            onPasted: root.expanded = false
+        }
     }
 
-    MonitorsPage {
+    Lazy {
         id: monitorsPage
-        y: root.headerH
-        height: root.cardH - root.headerH
-        opacity: (root.expanded && root.page === "monitors") ? 1 : 0
+        wanted: (root.expanded && root.page === "monitors")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onOpenPage: name => root.page = name
+
+        sourceComponent: MonitorsPage {
+            y: root.headerH
+            height: root.cardH - root.headerH
+            onOpenPage: name => root.page = name
+        }
     }
 
-    WifiPage {
+    Lazy {
         id: wifiPage
-        opacity: (root.expanded && root.page === "wifi") ? 1 : 0
+        wanted: (root.expanded && root.page === "wifi")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "main"
+
+        sourceComponent: WifiPage {
+            onBack: root.page = "main"
+        }
     }
 
-    BluetoothPage {
+    Lazy {
         id: btPage
-        opacity: (root.expanded && root.page === "bluetooth") ? 1 : 0
+        wanted: (root.expanded && root.page === "bluetooth")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "main"
+
+        sourceComponent: BluetoothPage {
+            onBack: root.page = "main"
+        }
     }
 
-    DisplayPage {
+    Lazy {
         id: displayPage
-        opacity: (root.expanded && root.page === "display") ? 1 : 0
+        wanted: (root.expanded && root.page === "display")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "main"
+
+        sourceComponent: DisplayPage {
+            onBack: root.page = "main"
+        }
     }
 
-    SoundPage {
+    Lazy {
         id: soundPage
-        opacity: (root.expanded && root.page === "sound") ? 1 : 0
+        wanted: (root.expanded && root.page === "sound")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "main"
+
+        sourceComponent: SoundPage {
+            onBack: root.page = "main"
+        }
     }
 }

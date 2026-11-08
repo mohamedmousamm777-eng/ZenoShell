@@ -84,11 +84,11 @@ Rectangle {
     readonly property int captureW: 470
     readonly property int captureH: 196
     readonly property int recW: 360
-    readonly property int recH: Math.round(recView.implicitHeight)
+    readonly property int recH: Math.round(recView.itemImplicitHeight)
     readonly property int nameW: 380
     readonly property int nameH: Math.round(nameView.implicitHeight)
     readonly property int dayW: 340
-    readonly property int dayH: Math.round(dayView.implicitHeight)
+    readonly property int dayH: Math.round(dayView.itemImplicitHeight)
     readonly property int toastW: 380
     readonly property int toastH: Math.round(toastView.implicitHeight)
     readonly property int wsW: Math.round(wsView.implicitWidth)
@@ -366,19 +366,23 @@ Rectangle {
     }
 
     // ---------- Editor for the day's notes ----------
-    DayView {
+    Lazy {
         id: dayView
-
-        width: root.dayW
-        height: implicitHeight
-        year: root.dayYear
-        month: root.dayMonth
-        day: root.dayDay
-        opacity: root.mode === "day" ? 1 : 0
+        wanted: root.mode === "day"
+        resetOnLoad: true
+        opacity: wanted ? 1 : 0
         visible: root.mode === "day" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "day" ? 220 : 80 } }
 
-        onCloseRequested: root.dayMode = false
+        sourceComponent: DayView {
+            width: root.dayW
+            height: implicitHeight
+            year: root.dayYear
+            month: root.dayMonth
+            day: root.dayDay
+
+            onCloseRequested: root.dayMode = false
+        }
     }
 
     // ---------- Workspace ----------
@@ -405,71 +409,94 @@ Rectangle {
     }
 
     // ---------- Launcher ----------
-    LauncherView {
+    Lazy {
         id: launcherView
-
-        width: root.launcherW
-        height: root.launcherH
-        opacity: root.mode === "launcher" ? 1 : 0
+        wanted: root.mode === "launcher"
+        resetOnLoad: true
+        opacity: wanted ? 1 : 0
         visible: root.mode === "launcher" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "launcher" ? 240 : 80 } }
 
-        onCloseRequested: UiState.launcherOpen = false
+        sourceComponent: LauncherView {
+            width: root.launcherW
+            height: root.launcherH
+
+            onCloseRequested: UiState.launcherOpen = false
+        }
     }
 
     // ---------- Power ----------
-    PowerView {
+    Lazy {
         id: powerView
-
-        width: root.powerW
-        height: root.powerH
-        opacity: root.mode === "power" ? 1 : 0
+        wanted: root.mode === "power"
+        resetOnLoad: true
+        opacity: wanted ? 1 : 0
         visible: root.mode === "power" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "power" ? 240 : 80 } }
+
+        sourceComponent: PowerView {
+            width: root.powerW
+            height: root.powerH
+        }
     }
 
     // ---------- Theme selector ----------
-    ThemeView {
+    Lazy {
         id: themeView
-
-        width: root.themeW
-        height: root.themeH
-        opacity: root.mode === "theme" ? 1 : 0
+        wanted: root.mode === "theme"
+        resetOnLoad: true
+        opacity: wanted ? 1 : 0
         visible: root.mode === "theme" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "theme" ? 240 : 80 } }
+
+        sourceComponent: ThemeView {
+            width: root.themeW
+            height: root.themeH
+        }
     }
 
     // ---------- Dashboard version selector ----------
-    VariantView {
+    Lazy {
         id: variantView
-
-        width: root.variantW
-        height: root.variantH
-        opacity: root.mode === "variant" ? 1 : 0
+        wanted: root.mode === "variant"
+        resetOnLoad: true
+        opacity: wanted ? 1 : 0
         visible: root.mode === "variant" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "variant" ? 240 : 80 } }
+
+        sourceComponent: VariantView {
+            width: root.variantW
+            height: root.variantH
+        }
     }
 
     // ---------- Autenticazione ----------
-    AuthView {
+    Lazy {
         id: authView
-
-        width: root.authW
-        height: root.authH
-        opacity: root.mode === "auth" ? 1 : 0
+        wanted: root.mode === "auth"
+        resetOnLoad: true
+        opacity: wanted ? 1 : 0
         visible: root.mode === "auth" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "auth" ? 240 : 80 } }
+
+        sourceComponent: AuthView {
+            width: root.authW
+            height: root.authH
+        }
     }
 
     // ---------- Recording menu ----------
-    RecordView {
+    Lazy {
         id: recView
-
-        width: root.recW
-        height: implicitHeight
-        opacity: root.mode === "record" ? 1 : 0
+        wanted: root.mode === "record"
+        opacity: wanted ? 1 : 0
         visible: root.mode === "record" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "record" ? 240 : 80 } }
+
+        sourceComponent: RecordView {
+            width: root.recW
+            height: implicitHeight
+        }
     }
 
     // ---------- Recording name ----------
@@ -484,13 +511,17 @@ Rectangle {
     }
 
     // ---------- Capture ----------
-    CaptureView {
+    Lazy {
         id: captureView
-
-        width: root.captureW
-        height: root.captureH
-        opacity: root.mode === "capture" ? 1 : 0
+        wanted: root.mode === "capture"
+        resetOnLoad: true
+        opacity: wanted ? 1 : 0
         visible: root.mode === "capture" || opacity > 0
         Behavior on opacity { NumberAnimation { duration: root.mode === "capture" ? 240 : 80 } }
+
+        sourceComponent: CaptureView {
+            width: root.captureW
+            height: root.captureH
+        }
     }
 }

@@ -5,7 +5,7 @@ img="$1"
 # a normal wallpaper replaces the animated one (apply-live.sh sets QS_KEEP_LIVE)
 if [ -z "$QS_KEEP_LIVE" ] && [ -e "$HOME/.cache/quickshell-live-current" ]; then
     rm -f "$HOME/.cache/quickshell-live-current"
-    qs -p "$(cd "$(dirname "$0")/.." && pwd)" ipc call livewall reload >/dev/null 2>&1
+    qs ipc call livewall reload >/dev/null 2>&1
 fi
 
 if command -v awww >/dev/null 2>&1; then

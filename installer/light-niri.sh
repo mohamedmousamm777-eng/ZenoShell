@@ -30,7 +30,7 @@ say "shortcuts: $(grep -cE '^[ \t]*[A-Z][A-Za-z0-9_+]*([ \t]+[a-z-]+=[^ \t]+)*[ 
 {
     echo "// Startup of the shell and layer rules (written by quickshell-dots; regenerated on every install)"
     echo 'spawn-sh-at-startup "mkdir -p ~/Screenshots"'
-    grep -qE 'spawn(-sh)?-at-startup.*"(quickshell|qs)"' "$tmpd/user.kdl" || echo 'spawn-at-startup "quickshell"'
+    grep -qE 'spawn(-sh)?-at-startup.*"(quickshell|qs)"' "$tmpd/user.kdl" || echo 'spawn-at-startup "quickshell" "-n"'
     if ! grep -qE 'awww-daemon|swww-daemon' "$tmpd/user.kdl"; then
         if command -v awww >/dev/null 2>&1; then
             echo 'spawn-at-startup "awww-daemon"'

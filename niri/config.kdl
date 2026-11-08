@@ -4,7 +4,7 @@
 
 // ───────────── Startup ─────────────
 spawn-sh-at-startup "mkdir -p ~/Screenshots"
-spawn-at-startup "quickshell"
+spawn-at-startup "quickshell" "-n"
 
 // awww: one daemon for the wallpaper and one for the overview backdrop (the blurred one)
 spawn-at-startup "awww-daemon"

@@ -123,6 +123,10 @@ sh install.sh
 
 Ti richiede il tipo di installazione: usa lo stesso di prima. Il backup viene salvato ogni volta. In modalità leggera il tuo config non viene mai rimpiazzato; in quella completa chiede prima di rimpiazzare `config.kdl` / `hyprland.lua`, e se rispondi `n` tieni il tuo file (le scorciatoie nuove arrivano solo se il tuo file include `quickshell.kdl` / `quickshell-binds.lua`).
 
+#### Avviare e riavviare la shell
+
+Avviala con `qs -n -d` e riavviala con `qs kill; sleep 1; qs -n -d`. Il semplice `qs` **non** controlla se la shell è già in esecuzione: ogni `qs` che scrivi avvia una copia completa in più (due barre, due server di notifiche). Il flag `-n` vuol dire «non fare nulla se è già avviata», e le righe di autostart di questo repo lo usano già (`spawn-at-startup "quickshell" "-n"` su niri, `hl.exec_cmd("qs -n")` su Hyprland). Se hai installato una versione vecchia, cambia a mano quella riga nel tuo config. Se vedi tutto doppio, `qs list` mostra le copie in esecuzione e `qs kill` le chiude tutte.
+
 ### Disinstallare
 
 `sh install.sh --uninstall` toglie il blocco marcato dal tuo `config.kdl` / `hyprland.lua` e sposta `~/.config/quickshell` nel backup. Se avevi usato la modalità completa, ripristina il tuo vecchio config da `~/.config/quickshell-backup-DATA`.

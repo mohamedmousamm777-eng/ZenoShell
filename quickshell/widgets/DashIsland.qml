@@ -915,63 +915,91 @@ Rectangle {
     }
 
     // ---------- Pages (cross-fade) ----------
-    DashPage {
+    Lazy {
         id: dashPage
-        x: 0; y: root.headerH
-        opacity: (root.contentOn && root.page === "dash") ? 1 : 0
+        wanted: (root.contentOn && root.page === "dash")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onOpenPage: name => root.page = name
-        onPasted: root.mode = "closed"
+
+        sourceComponent: DashPage {
+            x: 0; y: root.headerH
+            onOpenPage: name => root.page = name
+            onPasted: root.mode = "closed"
+        }
     }
 
-    ToolsDash {
+    Lazy {
         id: toolsDash
-        x: 0; y: root.headerH
-        opacity: (root.contentOn && root.page === "tools") ? 1 : 0
+        wanted: (root.contentOn && root.page === "tools")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onPasted: root.mode = "closed"
+
+        sourceComponent: ToolsDash {
+            x: 0; y: root.headerH
+            onPasted: root.mode = "closed"
+        }
     }
 
-    MonitorsDash {
+    Lazy {
         id: monitorsDash
-        x: 0; y: root.headerH
-        opacity: (root.contentOn && root.page === "monitors") ? 1 : 0
+        wanted: (root.contentOn && root.page === "monitors")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onOpenPage: name => root.page = name
+
+        sourceComponent: MonitorsDash {
+            x: 0; y: root.headerH
+            onOpenPage: name => root.page = name
+        }
     }
 
-    WifiPage {
+    Lazy {
         id: wifiPage
-        opacity: (root.contentOn && root.page === "wifi") ? 1 : 0
+        wanted: (root.contentOn && root.page === "wifi")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "dash"
+
+        sourceComponent: WifiPage {
+            onBack: root.page = "dash"
+        }
     }
 
-    BluetoothPage {
+    Lazy {
         id: btPage
-        opacity: (root.contentOn && root.page === "bluetooth") ? 1 : 0
+        wanted: (root.contentOn && root.page === "bluetooth")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "dash"
+
+        sourceComponent: BluetoothPage {
+            onBack: root.page = "dash"
+        }
     }
 
-    DisplayPage {
+    Lazy {
         id: displayPage
-        opacity: (root.contentOn && root.page === "display") ? 1 : 0
+        wanted: (root.contentOn && root.page === "display")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "dash"
+
+        sourceComponent: DisplayPage {
+            onBack: root.page = "dash"
+        }
     }
 
-    SoundPage {
+    Lazy {
         id: soundPage
-        opacity: (root.contentOn && root.page === "sound") ? 1 : 0
+        wanted: (root.contentOn && root.page === "sound")
+        opacity: wanted ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 180 } }
-        onBack: root.page = "dash"
+
+        sourceComponent: SoundPage {
+            onBack: root.page = "dash"
+        }
     }
 }

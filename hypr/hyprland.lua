@@ -23,7 +23,7 @@ end)
 ---- AUTOSTART ----
 -------------------
 hl.on("hyprland.start", function()
-    hl.exec_cmd("qs")                                                     -- shell (barra, notifiche, polkit...)
+    hl.exec_cmd("qs -n")                                                  -- shell (-n: never a second copy) (barra, notifiche, polkit...)
     hl.exec_cmd("sh ~/.config/quickshell/scripts/restore-wallpaper.sh")   -- sfondo e colori
     hl.exec_cmd("mkdir -p ~/Screenshots")                                 -- cartella screenshot
     hl.exec_cmd("sh ~/.config/quickshell/scripts/pywalfox-watch.sh")      -- colori Firefox (se pywalfox c'è)

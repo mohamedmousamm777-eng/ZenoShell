@@ -41,7 +41,7 @@ say "shortcuts: $(grep -cE '^[ \t]*bind[ \t]*\(' "$hd/quickshell-binds.lua") ins
     echo
     echo '-- Startup'
     echo 'hl.on("hyprland.start", function()'
-    grep -qE 'exec_cmd\("(quickshell|qs)"\)' "$tmpd/user.lua" || echo '    hl.exec_cmd("qs")'
+    grep -qE 'exec_cmd\("(quickshell|qs)( -n)?"\)' "$tmpd/user.lua" || echo '    hl.exec_cmd("qs -n")'
     echo '    hl.exec_cmd("sh ~/.config/quickshell/scripts/restore-wallpaper.sh")'
     echo '    hl.exec_cmd("mkdir -p ~/Screenshots")'
     echo '    hl.exec_cmd("sh ~/.config/quickshell/scripts/pywalfox-watch.sh")'

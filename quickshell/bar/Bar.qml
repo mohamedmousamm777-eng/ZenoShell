@@ -54,7 +54,13 @@ Scope {
             // Dashboard "Attached" version: the bar is fused with the top edge of the screen
             readonly property bool attachedDash: dashStyle && Style.dashAttached
             // The island that drives keyboard shortcuts (Alt+1/2/3, Esc)
-            readonly property var ctl: win.sideStyle ? popouts : (win.dashStyle ? dash : control)
+            // (the islands of the styles that are not in use do not exist: `ctl` is null until the active one is created)
+            readonly property var ctl: win.sideStyle ? popouts.item : (win.dashStyle ? dash.item : control.item)
+            readonly property bool ctlExpanded: win.ctl ? win.ctl.expanded === true : false
+            readonly property bool ctlNeedsKeyboard: win.ctl ? win.ctl.needsKeyboard === true : false
+            readonly property bool dashOpen: dash.item ? dash.item.mode === "open" : false
+            readonly property bool popExpanded: popouts.item ? popouts.item.expanded === true : false
+            readonly property bool popWantsKeyboard: popouts.item ? popouts.item.wantsKeyboard === true : false
             // Islands of the Island / Classic styles
             readonly property bool islands: !win.dashStyle && !win.sideStyle
 
@@ -69,8 +75,8 @@ Scope {
 
             // Launcher, power, authentication: exclusive keyboard (you can type right away).
             // Wi-Fi password: only on request.
-            WlrLayershell.keyboardFocus: (clock.wantsKeyboard || win.typeToLaunch || (win.sideStyle ? popouts.wantsKeyboard : win.ctl.expanded)) ? WlrKeyboardFocus.Exclusive
-                                         : (win.ctl.needsKeyboard ? WlrKeyboardFocus.OnDemand
+            WlrLayershell.keyboardFocus: (clock.wantsKeyboard || win.typeToLaunch || (win.sideStyle ? win.popWantsKeyboard : win.ctlExpanded)) ? WlrKeyboardFocus.Exclusive
+                                         : (win.ctlNeedsKeyboard ? WlrKeyboardFocus.OnDemand
                                                                   : WlrKeyboardFocus.None)
 
             // Empty desktop (no window on this monitor's active workspace)
@@ -86,7 +92,7 @@ Scope {
 
                 Keys.onPressed: event => {
                     // Control island open: Alt+1/2/3 switches page, Esc closes it
-                    if (win.ctl.expanded) {
+                    if (win.ctlExpanded) {
                         if ((event.modifiers & Qt.AltModifier) && event.key >= Qt.Key_1 && event.key <= Qt.Key_3) {
                             win.ctl.gotoPage(event.key - Qt.Key_1)
                             event.accepted = true
@@ -115,15 +121,15 @@ Scope {
             Connections {
                 target: win.ctl
                 function onExpandedChanged() {
-                    if (win.ctl.expanded && !win.sideStyle) typer.forceActiveFocus()
+                    if (win.ctlExpanded && !win.sideStyle) typer.forceActiveFocus()
                 }
             }
 
             // Same for the launcher / power panel of the Vertical style
             Connections {
-                target: popouts
+                target: popouts.item
                 function onExpandedChanged() {
-                    if (!popouts.expanded && win.typeToLaunch) typer.forceActiveFocus()
+                    if (!win.popExpanded && win.typeToLaunch) typer.forceActiveFocus()
                 }
             }
 
@@ -137,14 +143,14 @@ Scope {
 
             // Clicks pass through everything except the islands/pills
             mask: Region {
-                Region { item: media }
+                Region { item: media.item }
                 Region { item: clock }
-                Region { item: control }
-                Region { item: dash }
-                Region { item: side }
-                Region { item: popouts.panel }
+                Region { item: control.item }
+                Region { item: dash.item }
+                Region { item: side.item }
+                Region { item: popouts.item ? popouts.item.panel : null }
                 Region { item: dismiss }
-                Region { item: wsDots }
+                Region { item: wsDots.item }
             }
 
             Item {
@@ -152,33 +158,38 @@ Scope {
                 anchors.fill: parent
 
                 // "Island" style: the three islands centered at the top, as before
-                readonly property real islandsW: media.width + clock.width + control.width + Theme.gap * 2
+                readonly property real islandsW: media.w + clock.width + control.w + Theme.gap * 2
                 readonly property real startX: (width - islandsW) / 2
 
                 // Dashboard open: a click anywhere else closes it (covers the whole window only while open)
                 Item {
                     id: dismiss
                     z: -1
-                    width: ((win.dashStyle && dash.mode === "open") || (win.sideStyle && popouts.expanded)) ? stage.width : 0
-                    height: ((win.dashStyle && dash.mode === "open") || (win.sideStyle && popouts.expanded)) ? stage.height : 0
+                    width: ((win.dashStyle && win.dashOpen) || (win.sideStyle && win.popExpanded)) ? stage.width : 0
+                    height: ((win.dashStyle && win.dashOpen) || (win.sideStyle && win.popExpanded)) ? stage.height : 0
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: win.ctl.close()
+                        onClicked: if (win.ctl) win.ctl.close()
                     }
                 }
 
                 // Music = launcher: without a player it is the circle that opens the launcher, with music it becomes the card.
                 // In the classic bar it sits at the far left (and above the workspaces when it opens)
-                MediaIsland {
+                Loader {
                     id: media
-                    visible: win.islands
+                    // size of the island (0 while it does not exist); the Loader is only its anchor point
+                    readonly property real w: item ? item.width : 0
+                    readonly property real h: item ? item.height : 0
+                    active: win.islands
                     z: 5
                     x: win.classic ? 14 : stage.startX
-                    onLauncherRequested: {
-                        UiState.launcherScreen = win.modelData.name
-                        UiState.powerOpen = false
-                        UiState.launcherOpen = !UiState.launcherOpen
+                    sourceComponent: MediaIsland {
+                        onLauncherRequested: {
+                            UiState.launcherScreen = win.modelData.name
+                            UiState.powerOpen = false
+                            UiState.launcherOpen = !UiState.launcherOpen
+                        }
                     }
                 }
 
@@ -189,7 +200,7 @@ Scope {
                     attachedPanels: win.sideStyle
                     screenName: win.modelData.name
                     // classic: the clock is always at the center of the screen
-                    x: (win.classic || win.dashStyle || win.sideStyle) ? (stage.width - clock.width) / 2 + (win.sideStyle ? side.width / 2 : 0) : media.x + media.width + Theme.gap
+                    x: (win.classic || win.dashStyle || win.sideStyle) ? (stage.width - clock.width) / 2 + (win.sideStyle ? side.width / 2 : 0) : media.x + media.w + Theme.gap
                     y: 0
                 }
 
@@ -206,77 +217,99 @@ Scope {
                 }
 
                 // Workspaces on the left, next to the launcher (classic bar only)
-                WorkspaceDots {
+                Loader {
                     id: wsDots
-                    visible: win.classic
-                    screenName: win.modelData.name
+                    // size of the island (0 while it does not exist); the Loader is only its anchor point
+                    readonly property real w: item ? item.width : 0
+                    readonly property real h: item ? item.height : 0
+                    active: win.classic
                     x: 14 + Theme.islandHeight + Theme.gap
                     y: 0
+                    sourceComponent: WorkspaceDots { screenName: win.modelData.name }
                 }
 
                 // Attached Dashboard: the shape (with the curves where it meets the edge) is drawn behind the island
                 AttachedShape {
-                    visible: win.attachedDash && dash.visible
+                    visible: win.attachedDash && dash.visible && dash.item !== null
                     z: -0.4
                     x: dash.x - fillet
                     y: dash.y
-                    bodyWidth: dash.width
-                    bodyHeight: dash.height
-                    corner: dash.corner
-                    edgeColor: dash.edgeColor
-                    edgeWidth: dash.edgeWidth
+                    bodyWidth: dash.w
+                    bodyHeight: dash.h
+                    corner: dash.item ? dash.item.corner : 18
+                    edgeColor: dash.item ? dash.item.edgeColor : Theme.border
+                    edgeWidth: dash.item ? dash.item.edgeWidth : 1
                 }
 
-                DashIsland {
+                Loader {
                     id: dash
-                    visible: win.dashStyle && !clock.special
-                    screenName: win.modelData.name
-                    x: (stage.width - dash.width) / 2
+                    // size of the island (0 while it does not exist); the Loader is only its anchor point
+                    readonly property real w: item ? item.width : 0
+                    readonly property real h: item ? item.height : 0
+                    active: win.dashStyle
+                    visible: !clock.special
+                    x: (stage.width - dash.w) / 2
                     y: 0
+                    sourceComponent: DashIsland { screenName: win.modelData.name }
                 }
 
                 // ---- Vertical style: frame + bar + panels ----
-                ScreenFrame {
+                readonly property real frameEdge: 8
+
+                Loader {
                     id: frame
-                    visible: win.sideStyle
+                    active: win.sideStyle
                     z: -0.5
                     anchors.fill: parent
-                    barW: side.width
-                    edge: 8
-                    radius: 22
+                    sourceComponent: ScreenFrame {
+                        anchors.fill: parent
+                        barW: side.width
+                        edge: stage.frameEdge
+                        radius: 22
+                    }
                 }
 
-                SideRail {
+                Loader {
                     id: side
-                    visible: win.sideStyle
+                    active: win.sideStyle
                     width: 46
                     height: parent.height
                     x: 0
                     y: 0
-                    screenName: win.modelData.name
-                    current: popouts.current
-                    onRequest: (name, cy) => popouts.activate(name, cy)
-                    onPeek: (name, cy) => popouts.hoverOpen(name, cy)
-                    onUnpeek: popouts.hoverCancel()
+                    readonly property bool hovered: item ? item.hovered === true : false
+                    sourceComponent: SideRail {
+                        anchors.fill: parent
+                        screenName: win.modelData.name
+                        current: popouts.item ? popouts.item.current : ""
+                        onRequest: (name, cy) => { if (popouts.item) popouts.item.activate(name, cy) }
+                        onPeek: (name, cy) => { if (popouts.item) popouts.item.hoverOpen(name, cy) }
+                        onUnpeek: { if (popouts.item) popouts.item.hoverCancel() }
+                    }
                 }
 
-                Popouts {
+                Loader {
                     id: popouts
-                    visible: win.sideStyle
+                    active: win.sideStyle
                     anchors.fill: parent
-                    screenName: win.modelData.name
-                    barW: side.width
-                    edge: frame.edge
-                    stageH: stage.height
-                    railHovered: side.hovered
+                    sourceComponent: Popouts {
+                        anchors.fill: parent
+                        screenName: win.modelData.name
+                        barW: side.width
+                        edge: stage.frameEdge
+                        stageH: stage.height
+                        railHovered: side.hovered
+                    }
                 }
 
-                ControlIsland {
+                Loader {
                     id: control
-                    visible: win.islands
-                    classic: win.classic
-                    x: win.classic ? stage.width - 14 - control.width : clock.x + clock.width + Theme.gap
+                    // size of the island (0 while it does not exist); the Loader is only its anchor point
+                    readonly property real w: item ? item.width : 0
+                    readonly property real h: item ? item.height : 0
+                    active: win.islands
+                    x: win.classic ? stage.width - 14 - control.w : clock.x + clock.width + Theme.gap
                     y: 0
+                    sourceComponent: ControlIsland { classic: win.classic }
                 }
             }
         }

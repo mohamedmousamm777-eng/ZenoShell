@@ -2,7 +2,7 @@ import QtQuick
 import qs.theme
 
 // wifi | bluetooth | focus | game | lock | moon | volume | sun | power | logout | reboot
-// eq | play | pause | stop | flag | hourglass | stopwatch | star | gear | bell | grid | cpu | ram (level 0 = empty, otherwise filled)
+// person | eq | play | pause | stop | flag | hourglass | stopwatch | star | gear | bell | grid | cpu | ram (level 0 = empty, otherwise filled)
 Canvas {
     id: root
 
@@ -281,6 +281,17 @@ Canvas {
                 ctx.lineTo(8 + Math.cos(a) * 6.9, 8 + Math.sin(a) * 6.9)
                 ctx.stroke()
             }
+        } else if (kind === "person") {
+            // head and shoulders
+            ctx.beginPath()
+            ctx.arc(8, 5.2, 3.2, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.beginPath()
+            ctx.moveTo(2.2, 14.2)
+            ctx.bezierCurveTo(2.2, 9.8, 5, 9, 8, 9)
+            ctx.bezierCurveTo(11, 9, 13.8, 9.8, 13.8, 14.2)
+            ctx.closePath()
+            ctx.fill()
         } else if (kind === "bell") {
             ctx.beginPath()
             ctx.moveTo(3.4, 11.2)

@@ -49,10 +49,10 @@ Scope {
             screen: modelData
 
             anchors { bottom: true; left: true; right: true }
-            implicitHeight: 84
+            implicitHeight: 72
             color: "transparent"
             exclusionMode: ExclusionMode.Normal
-            exclusiveZone: 84
+            exclusiveZone: 72
 
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "shell-dock"
@@ -64,12 +64,12 @@ Scope {
             Rectangle {
                 id: dock
 
-                width: row.implicitWidth + 28
-                height: 66
-                radius: 28
+                width: row.implicitWidth + 20
+                height: 54
+                radius: 22
                 x: (win.width - width) / 2
-                y: win.height - height - 12
-                color: Qt.rgba(Theme.island.r, Theme.island.g, Theme.island.b, 0.92)
+                y: win.height - height - 8
+                color: Qt.rgba(Theme.island.r, Theme.island.g, Theme.island.b, 0.88)
                 border.width: 1
                 border.color: Theme.border
 
@@ -77,13 +77,13 @@ Scope {
 
                 Row {
                     id: row
-                    x: 14
+                    x: 10
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 12
+                    spacing: 8
 
                     // Launcher
                     Rectangle {
-                        width: 46; height: 46; radius: 16
+                        width: 38; height: 38; radius: 12
                         anchors.verticalCenter: parent.verticalCenter
                         color: lm.containsMouse ? Theme.islandHover : Theme.surfaceSoft
                         Glyph { anchors.centerIn: parent; kind: "grid"; size: 18; color: Theme.foreground }
@@ -106,15 +106,15 @@ Scope {
                         delegate: Item {
                             id: app
                             required property var modelData
-                            width: 50; height: 56
+                            width: 42; height: 46
                             anchors.verticalCenter: parent.verticalCenter
 
                             Image {
                                 id: icon
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                y: m.containsMouse ? 0 : 4
-                                width: 46; height: 46
-                                sourceSize: Qt.size(92, 92)
+                                y: m.containsMouse ? 0 : 3
+                                width: 38; height: 38
+                                sourceSize: Qt.size(76, 76)
                                 smooth: true
                                 scale: m.containsMouse ? 1.12 : 1
                                 Behavior on y { NumberAnimation { duration: 120 } }
@@ -125,7 +125,7 @@ Scope {
                             Rectangle {
                                 visible: app.modelData.running
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                y: parent.height - 5
+                                y: parent.height - 4
                                 width: app.modelData.active ? 12 : 5
                                 height: 4; radius: 2
                                 color: app.modelData.active ? Theme.accent : Theme.muted

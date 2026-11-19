@@ -9,6 +9,8 @@ Rectangle {
     id: root
 
     property bool expanded: false
+    property string look: "bar"          // bar | full | capsules | floating (closed appearance)
+    property color closedTint: Theme.island
     property bool classic: false         // classic bar: when closed it is a pill [wifi ⚙ bluetooth]
     property string page: "main"        // main | tools | monitors | wifi | bluetooth | display | sound
 
@@ -36,12 +38,14 @@ Rectangle {
     readonly property int mainH: baseMainH + headerH
     readonly property int cardH: page === "main" ? mainH : (page === "tools" ? 536 : 440)
 
-    width:  expanded ? cardW : (classic ? 104 : Theme.islandHeight)
+    // width of the closed pill (the bar reserves this space)
+    readonly property int closedW: look === "bar" ? 104 : Math.ceil(closedRow.implicitWidth) + (look === "capsules" ? 30 : 0)
+    width:  expanded ? cardW : (classic ? closedW : Theme.islandHeight)
     height: expanded ? cardH : Theme.islandHeight
     radius: Math.min(26, height / 2)
-    readonly property bool bare: classic && !expanded && Style.classicPlain
-    color: bare ? "transparent" : ((!expanded && hovered) ? Theme.islandHover : Theme.island)
-    border.width: bare ? 0 : 1
+    readonly property bool bare: classic && !expanded && (look === "full" || look === "floating")
+    color: bare ? "transparent" : (!expanded && classic && look === "capsules" ? closedTint : ((!expanded && hovered) ? Theme.islandHover : Theme.island))
+    border.width: (bare || (!expanded && look === "capsules")) ? 0 : 1
     border.color: Theme.border
     clip: true
 
@@ -169,31 +173,58 @@ Rectangle {
         visible: NotifCenter.unread && !root.expanded && !root.classic
     }
 
-    // ---------- Classic bar, when closed: wifi · settings · bluetooth ----------
+    // ---------- Classic bar, when closed ----------
+    // bar: wifi · settings · bluetooth     looks: [mic muted] volume · wifi · [bluetooth]
     Row {
+        id: closedRow
         anchors.centerIn: parent
-        spacing: 14
+        spacing: root.look === "bar" ? 14 : 12
         opacity: (root.classic && !root.expanded) ? 1 : 0
         visible: opacity > 0
         Behavior on opacity { NumberAnimation { duration: 120 } }
 
         Glyph {
+            visible: root.look === "floating" && Audio.micMuted
+            kind: "mic"; level: 0; size: 15
+            color: Theme.muted
+        }
+        Glyph {
+            visible: root.look !== "bar"
+            kind: "volume"
+            level: Audio.muted || Audio.volume <= 0.001 ? 0 : (Audio.volume > 0.5 ? 2 : 1)
+            size: 15
+            color: Audio.muted ? Theme.muted : Theme.foreground
+        }
+        Glyph {
             kind: "wifi"
             level: Network.level
             size: 15
-            color: Network.wifiOn ? (Network.connected ? Theme.accent : Theme.foreground) : Theme.muted
+            color: root.look === "bar" ? (Network.wifiOn ? (Network.connected ? Theme.accent : Theme.foreground) : Theme.muted)
+                                       : (Network.wifiOn ? Theme.foreground : Theme.muted)
         }
-
         Glyph {
+            visible: root.look === "bar"
             kind: "gear"
             size: 15
             color: Theme.foreground
         }
-
-        Glyph {
-            kind: "bluetooth"
-            size: 15
-            color: (root.btOn) ? Theme.accent : Theme.muted
+        // bluetooth: crossed out when it is off
+        Item {
+            visible: root.look !== "floating"
+            width: 15; height: 15
+            Glyph {
+                anchors.fill: parent
+                kind: "bluetooth"
+                size: 15
+                color: root.btOn ? (root.look === "bar" ? Theme.accent : Theme.foreground) : Theme.muted
+            }
+            Rectangle {
+                visible: root.look !== "bar" && !root.btOn
+                anchors.centerIn: parent
+                width: 18; height: 1.6; radius: 1
+                rotation: 45
+                color: Theme.muted
+            }
         }
     }
 

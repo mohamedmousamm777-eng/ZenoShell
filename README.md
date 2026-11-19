@@ -5,6 +5,8 @@
 A complete desktop shell built with [Quickshell](https://quickshell.org), for **niri** and **Hyprland**.
 One install, the same shortcuts and the same four styles on both compositors.
 
+**Version 1.2.0** · [What's new](RELEASE_NOTES_1.2.0.md)
+
 > ## ⚠️ Read this before opening an issue
 >
 > This is **not a project for everyone**. I made it because I felt like it, and it works on **my** laptop.
@@ -73,6 +75,13 @@ The inspiration comes from [SaneAspect](https://www.youtube.com/@saneAspect): I 
 - Quick settings: Wi-Fi, Bluetooth, sound, display, monitors (position, scale, rotation), keyboard layouts, Game Mode and Eco Mode.
 - Wallpaper picker; the colors of the whole shell (and Firefox, with Pywalfox) follow the wallpaper through pywal.
 - **Animated wallpapers** (videos and GIFs) with `Alt+Shift+W`: a second picker, the same carousel, for the `Wallpapers_Video` folder. They pause by themselves (fullscreen window, lock screen, Game Mode, Eco Mode, screen off) and can be turned off to save resources. No extra programs: it is drawn by the shell itself.
+- **Audio Center** (`Alt+A`): a system-wide equalizer (PipeWire filter chain) with a curve over draggable pills, knobs, presets and left/right balance. It looks different in each style; a blurred music strip sits above it. `Alt+Shift+A` turns the equalizer on and off.
+- **System Monitor** (`Alt+M`): six tiles (CPU, RAM, GPU, temperature, processes, network) with a detail view for each. It reads every graphics chip, **including the one inside the CPU**, and only reads while it is open.
+- **Weather with a real map** (`Alt+Shift+M`): OpenStreetMap / CARTO tiles with weather layers, forecast and air quality (Open-Meteo). It asks your permission before using your location.
+- **One launcher for everything** (`Alt+R`): apps, files (`/`), open windows (`w`), clipboard (`c`), emoji (`:`), commands (`>`), a calculator, unit conversion and web search (`g`, `ddg`, `yt`, `gh`, `wp`, `mp`), all in a single list.
+- **Four looks for the Classic bar** (`Alt+V`): *Bar* (the original), *Full* (transparent, with a notch for the workspaces), *Capsules* and *Floating* with a dock. They show your tray icons and open apps and follow the pywal colors.
+- **Profile and lock screen** (Settings, first page): name, place, photo (pick it from a small selector of circles) and three lock styles: *Classic*, *Giant clock* and *Terminal*. Clock and login can go to any of nine positions.
+- **Lighter**: pages and panels are created only when you open them, so the shell uses about half the RAM it used to.
 - Screenshots and screen recording (with a name prompt and audio choice), media player with a live audio spectrum.
 - Volume / brightness OSD that follows the style (Island: pill on the right; Classic: pill at the bottom; Dashboard: upright slider, or the bar itself in the Attached version; Vertical: fused with the right edge, volume and brightness one under the other), clipboard history.
 
@@ -139,22 +148,30 @@ Video wallpapers need Qt Multimedia (`qt6-multimedia`, with the FFmpeg backend);
 
 For Game Mode / Eco Mode, `power-profiles-daemon` (`powerprofilesctl`) is used for the power profile.
 
+The Audio Center equalizer needs PipeWire (`pw-cli`) and the weather map downloads its tiles with `curl`. Optional: `nvidia-utils` (NVIDIA readings in the System Monitor) and `fd` (faster file search in the launcher).
+
 ### Wallpapers
 
 Put your images in `<Pictures>/Wallpapers` (for example `~/Pictures/Wallpapers` or `~/Immagini/Wallpapers`, the installer creates it), then press `Alt+W`.
 
 For animated wallpapers put videos (`mp4`, `webm`, `mkv`, `mov`) or GIFs in `<Pictures>/Wallpapers_Video`, next to the first folder, then press `Alt+Shift+W`.
 
+### Profile photos
+
+Put your profile photos in `<Pictures>/Profile` (for example `~/Immagini/Profile`; the shell creates it). They show up as circles in Settings, **Profile & lock screen**.
+
 ## Styles
 
 | Key | Style | What it is |
 |---|---|---|
 | `Mod+Alt+1` | **Island** | floating pills at the top that expand: music/launcher on the left, clock in the middle (calendar, notes), quick settings on the right |
-| `Mod+Alt+2` | **Classic** | a full-width bar: launcher, workspaces, clock in the center, quick settings |
+| `Mod+Alt+2` | **Classic** | a full-width bar with four looks (`Alt+V`): the original bar, *Full*, *Capsules* and *Floating* with a dock |
 | `Mod+Alt+3` | **Dashboard** | one pill that grows: closed (workspaces, clock, status), mouse over (clock, date, music, status), click (a full dashboard with pages) |
 | `Mod+Alt+4` | **Vertical** | a bar on the left with a thin frame around the screen; panels come out of the bar |
 
 The Dashboard has two **versions**, chosen with `Alt+V`: *Pill* (floating) and *Attached* (a bar fused with the top edge of the screen, with a curve where it meets the edge; the menus come out of the edge with the same shape).
+
+The Classic bar has four **looks**, chosen with `Alt+V`: *Bar* (the original: launcher, workspaces, clock and quick settings), *Full* (a transparent bar with stats, the title of the focused window, a notch with the workspaces in kanji, tray and battery), *Capsules* (colored capsules inside dark containers) and *Floating* (separate rounded boxes and a dock at the bottom with your favorite and open apps). The colors follow your pywal theme.
 
 ## Welcome tour
 
@@ -199,7 +216,7 @@ Only on Hyprland: `Mod+Tab` pin workspaces, `Mod+J` toggle split, `Mod+P` pseudo
 ### One by one
 
 #### `Alt+O` — settings
-Opens the Settings panel: a floating card in the middle of the screen, always the same size (it never turns into a window next to the others), with the sections on the left. `Alt+O` again, `Esc` or a click outside closes it. Open a section directly with `qs ipc call settings page <name>` (`appearance`, `bar`, `notifications`, `wallpaper`, `displays`, `network`, `bluetooth`, `audio`, `power`, `keys`, `about`). What you change there is saved in `~/.local/state/quickshell/`.
+Opens the Settings panel: a floating card in the middle of the screen, always the same size (it never turns into a window next to the others), with the sections on the left. `Alt+O` again, `Esc` or a click outside closes it. Open a section directly with `qs ipc call settings page <name>` (`appearance`, `bar`, `notifications`, `wallpaper`, `displays`, `network`, `bluetooth`, `audio`, `weather`, `power`, `keys`, `about`, `profile`). What you change there is saved in `~/.local/state/quickshell/`.
 
 #### `Alt+Shift+W` — animated wallpaper picker
 The same full-screen picker, but with the videos and GIFs of the `Wallpapers_Video` folder (next to `Wallpapers`). The thumbnails are still frames made with `ffmpeg` the first time. Applying one sets that frame as the normal wallpaper (so the pywal colors, the lock screen and the Light / Dark switch keep working) and plays the animation on top of it, always muted. It is drawn by the shell itself with Qt, one player per monitor, below your windows.
@@ -211,6 +228,21 @@ Opens a full-screen picker with the images of your `Wallpapers` folder. `←` `�
 
 #### `Alt+I` — system resources
 A panel slides out of the **left edge** of the screen with three rings: CPU, RAM and DISK. It also opens by itself when the mouse touches that edge. `Alt+I` pins it open until you press it again.
+
+#### `Alt+R` — launcher
+One list for everything. Type to search apps; `Tab` switches section (all, favorites, recent, categories). Prefixes: `/` or `f ` files, `w` open windows, `c` clipboard, `:` emoji, `>` run a command, `!` run it in the background, and `g ` `ddg ` `yt ` `gh ` `wp ` `mp ` to search the web. You can also type a calculation (`12*7`), a conversion (`5 km in mi`) or a web address. `Enter` opens, `Ctrl+F` marks a favorite, `Esc` closes.
+
+#### `Alt+A` — Audio Center
+Hangs from the music island (or the music strip of the side panel): the equalizer with a curve over pills, knobs for the tone, presets and left/right balance. Click or drag; it follows the pointer. It is a real system-wide equalizer made with a PipeWire filter chain, so everything you play goes through it. `Alt+Shift+A` turns it on and off.
+
+#### `Alt+M` — System Monitor
+A big panel with six tiles: CPU, RAM, GPU, temperature, processes and network. Click a tile for its detail view with a 2-minute history. It reads every graphics card (the one inside the CPU too, and NVIDIA through `nvidia-smi`). It only reads while it is open and closes with a click outside, `Esc` or `Alt+M` again. It is different from `Alt+I`, which is just three rings.
+
+#### `Alt+Shift+M` — weather
+A panel with a real map (OpenStreetMap or CARTO tiles) and weather layers, the forecast and the air quality (data from Open-Meteo). The first time it asks your permission to find your position; you can also search for a city. In Settings, **Weather & map**: on/off, place, units and language, map source and refresh.
+
+#### `Alt+L` — lock screen
+Locks the screen. The look is chosen in Settings, **Profile & lock screen**: *Classic* (blurred wallpaper, clock and login side by side), *Giant clock* (a huge clock and a small pill with a lock that fills with dots while you type) or *Terminal* (pixel look with buttons, your name, a login line and the clock in a corner). Clock and login can go to any of nine positions. `qs ipc call lock test` is a safe test: it unlocks by itself after 12 seconds.
 
 #### `Alt+Tab` — show workspaces
 Shows the workspaces for about 2.5 seconds (keep the mouse over it to keep it open). In Classic and Dashboard the workspaces are already in the bar, so no popup is shown there. `qs ipc call workspaces toggle` pins it until you repeat it.
@@ -239,8 +271,8 @@ Opens, **from the pill** (or from the side panel in Vertical), a carousel with t
 #### `Mod+Alt+T` — Light / Dark
 Switches between the light and the dark palette: it regenerates the pywal colors from the current wallpaper (`wal -l` for light), so the shell, **kitty and Firefox** change together. Does not change the wallpaper.
 
-#### `Alt+V` — Dashboard version
-Only for the Dashboard style (`Mod+Alt+3`). Opens a small picker, from the pill, with the two versions: *Pill* and *Attached*. `←` `→` browse (shown live), `Enter` applies, `Esc` cancels. In the *Attached* version the bar is fused with the top edge and, when music is playing, the bar that appears with the mouse over also shows the song (cover, title, artist and a progress bar).
+#### `Alt+V` — look / version
+In the **Classic** style it opens a small picker, from the clock, with the four looks (*Bar*, *Full*, *Capsules*, *Floating*). In the **Dashboard** style it picks between *Pill* and *Attached*. `←` `→` browse (shown live), `Enter` applies, `Esc` cancels. In the *Attached* version the bar is fused with the top edge and, when music is playing, the bar that appears with the mouse over also shows the song (cover, title, artist and a progress bar).
 
 #### `Print` — screenshot and recording menu
 Opens a menu to choose what to capture (screen, area, window; or to record) and the audio of the recording (none, microphone, system, both). If a recording is running, `Print` stops it.
@@ -262,17 +294,21 @@ Everything is also a command: `qs ipc call <target> <function>`. This is also wh
 |---|---|
 | `launcher` | `toggle` `open` `close` |
 | `power` | `toggle` `open` `close` |
-| `lock` | `lock` |
+| `lock` | `lock` `test` |
 | `wallpaper` | `toggle` `open` `video` `openvideo` |
 | `livewall` (animated wallpaper) | `toggle` `on` `off` `clear` `status` |
 | `settings` | `toggle` `open` `close` `page <name>` |
 | `system` | `toggle` `show` `hide` |
 | `workspaces` | `peek` `show` `toggle` |
+| `audiocenter` | `toggle` `open` `close` |
+| `audiofx` (equalizer) | `toggle` `on` `off` `preset <name>` `next` `prev` `status` |
+| `sysmon` (System Monitor) | `toggle` `open` `close` `view <cpu\|ram\|gpu\|temp\|proc\|net>` |
+| `weather` | `toggle` `open` `close` |
 | `gamemode` | `toggle` `on` `off` |
 | `powersaver` (Eco Mode) | `toggle` `on` `off` |
 | `dnd` | `toggle` `on` `off` `minutes <n>` |
 | `layout` | `next` `previous` |
-| `style` | `toggle` `open` `close` `set <island\|classic\|dash\|side>` `variant` `setvariant <pill\|attached>` |
+| `style` | `toggle` `open` `close` `set <island\|classic\|dash\|side>` `variant` `setvariant <pill\|attached\|bar\|full\|capsules\|floating>` |
 | `theme` | `toggle` `open` `close` `set <name>` `mode <dark\|light\|toggle>` |
 | `capture` | `toggle` `open` `stop` `pause` `recscreen` `recarea` `shotscreen` `shotarea` `shotwindow` `audio <off\|mic\|system\|both>` |
 

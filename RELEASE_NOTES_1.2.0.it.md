@@ -1,8 +1,8 @@
-# ZenoShell 1.2.0 beta
+# ZenoShell 1.2.0
 
 L'aggiornamento più grande finora: sfondi animati, un vero Audio Center, un System Monitor, un pannello meteo con mappa vera, un lanciatore unico, tre nuovi look per la barra Classic, profilo e stili del blocco schermo, e circa metà della RAM.
 
-> Questa è una **beta**. Tutto è scritto per niri e Hyprland su Arch Linux. Segnala quello che non funziona.
+> Fatta per niri e Hyprland su Arch Linux. Provata lì; tutto il resto, il tester sei tu.
 
 ## Novità
 
@@ -27,7 +27,7 @@ L'aggiornamento più grande finora: sfondi animati, un vero Audio Center, un Sys
 - Chiede il permesso prima di usare la posizione. Pagina nelle Impostazioni: attiva/disattiva, luogo, unità e lingua, fonte della mappa e aggiornamento.
 
 ### Lanciatore
-- Un'unica lista che unisce app, risultati tipo calcolatrice e ricerca web (nel browser attuale, con motori come `g`, `ddg`, `yt`, `gh`, `wp`, `mp`).
+- Un'unica lista: app, file (`/`), finestre aperte (`w`), appunti (`c`), emoji (`:`), comandi (`>`), calcolatrice, conversione di unità e ricerca web (`g`, `ddg`, `yt`, `gh`, `wp`, `mp`).
 
 ### Barra Classic: tre nuovi look (`Alt+V`)
 - **Full**: barra trasparente, statistiche, titolo finestra, notch con i workspace in kanji, tray e batteria.

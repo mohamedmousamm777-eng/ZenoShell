@@ -10,7 +10,7 @@ Singleton {
     id: root
 
     readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/quickshell"
-    readonly property string version: "1.2.0-beta"
+    readonly property string version: "1.2.0"
 
     // The Settings window
     property bool open: false

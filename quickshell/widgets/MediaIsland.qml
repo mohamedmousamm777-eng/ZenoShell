@@ -12,6 +12,7 @@ Rectangle {
 
     property bool expanded: false
     property string screenName: ""
+    property color restColor: Theme.island
     // The Audio Center hangs under the card: the card stays open while it is
     readonly property bool audioHere: UiState.audioOpen && UiState.audioScreen === screenName
     readonly property bool showCard: (expanded || audioHere) && Media.active       // the music card is open
@@ -30,7 +31,7 @@ Rectangle {
     width:  open ? cardW : Theme.islandHeight
     height: audioHere ? topH + eqH : topH
     radius: Math.min(26, height / 2)
-    color: (!open && hovered) ? Theme.islandHover : Theme.island
+    color: (!open && hovered) ? Theme.islandHover : restColor
     border.width: 1
     border.color: Theme.border
     clip: true

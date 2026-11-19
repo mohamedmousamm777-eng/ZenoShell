@@ -11,6 +11,7 @@ Scope {
     id: root
 
     readonly property var sections: [
+        { id: "profile",       label: "Profile & lock screen",  icon: "person",    file: "PageProfile.qml" },
         { id: "appearance",    label: "Appearance",             icon: "star",      file: "PageAppearance.qml" },
         { id: "bar",           label: "Bar & clock",            icon: "grid",      file: "PageBar.qml" },
         { id: "notifications", label: "Notifications & OSD",    icon: "bell",      file: "PageNotifications.qml" },

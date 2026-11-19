@@ -16,10 +16,20 @@ Item {
     property bool checking: false
     property int failCount: 0
 
-    // true: clock on the left and login on the right. Set false to swap them.
-    readonly property bool clockLeft: true
+    readonly property string style: Profile.lockStyle
+    readonly property bool classic: style === "classic"
+    // typed text (the hidden master field serves the Giant and Terminal styles)
+    readonly property string typed: classic ? input.text : master.text
 
-    readonly property string user: Quickshell.env("USER")
+    // where the pieces go: "tl tc tr / cl cc cr / bl bc br"
+    function posX(code, w, m) { const c = code.charAt(1); return c === "l" ? m : (c === "c" ? (width - w) / 2 : width - w - m) }
+    function posY(code, h, m) { const r = code.charAt(0); return r === "t" ? m : (r === "c" ? (height - h) / 2 : height - h - m) }
+    function alignOf(code) { const c = code.charAt(1); return c === "l" ? Text.AlignLeft : (c === "c" ? Text.AlignHCenter : Text.AlignRight) }
+    // The LOG IN button of the Terminal style
+    function submitTyped() { if (master.text !== "") { submit(master.text); master.text = "" } focusInput() }
+    function focusInput() { if (classic) input.forceActiveFocus(); else master.forceActiveFocus() }
+
+    readonly property string user: Profile.shownName
     property string wallpaper: ""
 
     signal submit(string password)
@@ -40,11 +50,28 @@ Item {
 
     Component.onCompleted: {
         try { wallpaper = (cur.text() || "").trim() } catch (e) {}
-        input.forceActiveFocus()
+        focusInput()
     }
 
     onFailCountChanged: shakeAnim.restart()
-    onCheckingChanged: if (!checking) input.forceActiveFocus()
+    onCheckingChanged: if (!checking) focusInput()
+    onStyleChanged: Qt.callLater(focusInput)
+
+    // Hidden field for the styles that draw the typed text themselves
+    TextInput {
+        id: master
+        width: 1; height: 1
+        opacity: 0
+        echoMode: TextInput.Password
+        readOnly: root.checking
+        onAccepted: {
+            if (text !== "") {
+                root.submit(text)
+                text = ""
+            }
+        }
+        Keys.onEscapePressed: text = ""
+    }
 
     NumberAnimation on opacity { from: 0; to: 1; duration: 450 }
 
@@ -61,41 +88,57 @@ Item {
         source: root.wallpaper !== "" ? "file://" + root.wallpaper : ""
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
-        sourceSize: Qt.size(1280, 800)
+        sourceSize: root.classic ? Qt.size(1280, 800) : Qt.size(1920, 1200)
     }
 
+    // Classic: blurred; Giant and Terminal: the wallpaper as it is
     MultiEffect {
         anchors.fill: parent
         source: bgImg
         visible: bgImg.status === Image.Ready
-        blurEnabled: true
+        blurEnabled: root.classic
         blur: 1.0
         blurMax: 64
     }
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.scrim
+        color: root.classic ? Theme.scrim : Qt.rgba(0, 0, 0, root.style === "terminal" ? 0.38 : 0.12)
     }
 
     MouseArea {
         anchors.fill: parent
-        onClicked: input.forceActiveFocus()
+        onClicked: root.focusInput()
+    }
+
+    // ---------- Giant clock and Terminal styles ----------
+    Loader {
+        anchors.fill: parent
+        active: root.style === "giant"
+        source: "LockGiant.qml"
+        onLoaded: item.host = root
+    }
+    Loader {
+        anchors.fill: parent
+        active: root.style === "terminal"
+        source: "LockTerminal.qml"
+        onLoaded: item.host = root
     }
 
     // ---------- Ora e data ----------
     Item {
         id: clockArea
 
-        x: root.clockLeft ? root.width * 0.07 : root.width * 0.5
+        visible: root.classic
         width: root.width * 0.43
         height: timeText.height + dateText.height + 8
-        anchors.verticalCenter: parent.verticalCenter
+        x: root.posX(Profile.clockAt, width, root.width * 0.07)
+        y: root.posY(Profile.clockAt, height, root.height * 0.08)
 
         Text {
             id: timeText
             width: parent.width
-            horizontalAlignment: root.clockLeft ? Text.AlignLeft : Text.AlignRight
+            horizontalAlignment: root.alignOf(Profile.clockAt)
             text: Qt.formatDateTime(clock.date, Settings.timeFormat)
             color: Theme.foreground
             font.family: Theme.fontFamily
@@ -107,7 +150,7 @@ Item {
             id: dateText
             y: timeText.height + 8
             width: parent.width
-            horizontalAlignment: root.clockLeft ? Text.AlignLeft : Text.AlignRight
+            horizontalAlignment: root.alignOf(Profile.clockAt)
             text: root.capitalize(Qt.locale("en_US").toString(clock.date, "dddd d MMMM"))
             color: Theme.foreground
             opacity: 0.75
@@ -120,10 +163,11 @@ Item {
     Item {
         id: loginArea
 
-        x: root.clockLeft ? root.width * 0.5 : root.width * 0.07
+        visible: root.classic
         width: root.width * 0.43
         height: loginCol.implicitHeight
-        anchors.verticalCenter: parent.verticalCenter
+        x: root.posX(Profile.loginAt, width, root.width * 0.07)
+        y: root.posY(Profile.loginAt, height, root.height * 0.08)
 
         Column {
             id: loginCol
@@ -139,7 +183,7 @@ Item {
                     anchors.centerIn: parent
                     width: 120
                     height: 120
-                    radius: 60
+                    radius: 120 * Profile.photoRadius
                     color: Qt.rgba(Theme.island.r, Theme.island.g, Theme.island.b, 0.8)
                     border.width: 2
                     border.color: Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.25)
@@ -147,7 +191,7 @@ Item {
                     Image {
                         id: face
                         anchors.fill: parent
-                        source: "file://" + Quickshell.env("HOME") + "/.face"
+                        source: Profile.photoUrl !== "" ? Profile.photoUrl : "file://" + Quickshell.env("HOME") + "/.face"
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
                         visible: status === Image.Ready
@@ -173,6 +217,16 @@ Item {
                 font.family: Theme.fontFamily
                 font.pixelSize: 20
                 font.bold: true
+            }
+
+            Text {
+                visible: Profile.place !== ""
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                text: Profile.place
+                color: Theme.muted
+                font.family: Theme.fontFamily
+                font.pixelSize: 13
             }
 
             Rectangle {
@@ -248,6 +302,7 @@ Item {
 
     // ---------- Top right: Wi-Fi and battery (symbol only), side by side ----------
     Row {
+        visible: root.classic
         anchors.top: parent.top
         anchors.topMargin: 28
         anchors.right: parent.right

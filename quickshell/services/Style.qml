@@ -32,6 +32,8 @@ Singleton {
     ]
 
     // Looks where the pieces have no capsule of their own ("Full": bare on the wallpaper; "Floating": inside one group)
+    // Height the bar reserves at the top, per look
+    readonly property int classicReserve: classicVariant === "capsules" ? 44 : (classicVariant === "floating" ? 48 : 34)
     readonly property bool classicPlain: classicLook && (classicVariant === "full" || classicVariant === "floating")
 
     property bool variantOpen: false        // the selector, inside the pill

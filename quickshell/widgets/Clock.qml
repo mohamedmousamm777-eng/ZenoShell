@@ -110,7 +110,7 @@ Rectangle {
         case "toast":      return [toastW, toastH]
         case "month":      return [monthW, monthH]
         case "compact":    return [compactW, compactH]
-        default:           return [collapsedW, Theme.islandHeight]
+        default:           return [ghost ? 0 : collapsedW, Theme.islandHeight]
         }
     }
 
@@ -126,9 +126,9 @@ Rectangle {
 
     radius: attachedLook ? corner : Math.min(24, height / 2)
     // Classic "Full" / "Floating" looks: the collapsed clock is bare (no capsule)
-    readonly property bool bare: Style.classicPlain && mode === "idle"
-    color: (attachedLook || bare) ? "transparent" : Theme.island
-    border.width: (attachedLook || bare) ? 0 : 1
+    readonly property bool ghost: Style.classicLook && mode === "idle"
+    color: (attachedLook || ghost) ? "transparent" : Theme.island
+    border.width: (attachedLook || ghost) ? 0 : 1
     border.color: edgeColor
     clip: true
 

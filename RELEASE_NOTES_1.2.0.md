@@ -1,8 +1,8 @@
-# ZenoShell 1.2.0 beta
+# ZenoShell 1.2.0
 
 The biggest update so far: animated wallpapers, a real Audio Center, a System Monitor, a weather panel with a real map, a unified launcher, three new looks for the Classic bar, profile and lock screen styles, and about half the memory use.
 
-> This is a **beta**. Everything was written for niri and Hyprland on Arch Linux. Please report what does not work.
+> Made for niri and Hyprland on Arch Linux. Tested there; anything else, you are the tester.
 
 ## What's new
 
@@ -27,7 +27,7 @@ The biggest update so far: animated wallpapers, a real Audio Center, a System Mo
 - Asks for permission before using your location. Settings page: on/off, place, units and language, map source and refresh.
 
 ### Launcher
-- One single list that mixes apps, calculator-style results and web search (search in your current browser, engines like `g`, `ddg`, `yt`, `gh`, `wp`, `mp`).
+- One single list: apps, files (`/`), open windows (`w`), clipboard (`c`), emoji (`:`), commands (`>`), a calculator, unit conversion and web search (`g`, `ddg`, `yt`, `gh`, `wp`, `mp`).
 
 ### Classic bar: three new looks (`Alt+V`)
 - **Full**: transparent bar, stats, window title, a notch with the workspaces in kanji, tray and battery.
@@ -50,6 +50,6 @@ The biggest update so far: animated wallpapers, a real Audio Center, a System Mo
 
 ## Update
 ```
-cd ~/quickshell-dots && git pull
+cd quickshell-dots && git pull
 ```
 then run the installer again, or copy the `quickshell`, `niri` and `hypr` folders by hand, and restart with `qs kill; sleep 2; qs -n -d`.

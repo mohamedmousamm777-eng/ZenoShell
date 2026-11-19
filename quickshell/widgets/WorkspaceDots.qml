@@ -10,6 +10,7 @@ Rectangle {
 
     readonly property var dots: Compositor.dotsFor(screenName)
     readonly property int activeId: Compositor.activeIdFor(screenName)
+    readonly property bool tall: Style.current === "classic" && Style.classicVariant === "floating"
 
     height: Theme.islandHeight
     width: row.implicitWidth + 26
@@ -48,14 +49,15 @@ Rectangle {
                 required property var modelData
                 readonly property bool active: modelData.id === root.activeId
 
-                width: active ? 38 : 10
-                height: 10
+                width: tall ? 10 : (active ? 38 : 10)
+                height: tall ? (active ? 24 : 18) : 10
                 radius: 5
                 anchors.verticalCenter: parent.verticalCenter
                 color: active ? Theme.accent
                        : (modelData.occupied ? Theme.foreground : Theme.mix(Theme.island, Theme.foreground, 0.20))
 
                 Behavior on width { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                Behavior on height { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
                 Behavior on color { ColorAnimation { duration: 160 } }
 
                 MouseArea {

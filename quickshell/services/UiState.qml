@@ -23,6 +23,12 @@ Singleton {
     property bool recMenuOpen: false
     property string recMenuScreen: ""
 
+    // Audio Center (equalizer), opened from the music part or with the shortcut
+    property bool audioOpen: false
+    property string audioScreen: ""
+    function openAudio() { audioScreen = Compositor.focusedMonitor; audioOpen = true }
+    function toggleAudio() { if (audioOpen) audioOpen = false; else openAudio() }
+
     // Lockscreen
     property bool locked: false
     property bool lockTest: false

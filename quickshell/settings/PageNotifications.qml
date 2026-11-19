@@ -4,8 +4,21 @@ import qs.services
 import qs.widgets
 
 SPage {
+    id: page
+
     title: "Notifications & OSD"
-    subtitle: "Do Not Disturb and the volume / brightness indicator."
+    subtitle: "Do Not Disturb, the notification history and the volume / brightness indicator."
+
+    property bool confirmDelete: false
+
+    Timer {
+        id: confirmTimer
+        interval: 3000
+        onTriggered: page.confirmDelete = false
+    }
+
+    onVisibleChanged: if (visible) NotifStore.refreshCount()
+    Component.onCompleted: NotifStore.refreshCount()
 
     SSection {
         title: "Do Not Disturb"
@@ -30,6 +43,40 @@ SPage {
                 model: [{ id: "30", label: "30 min" }, { id: "60", label: "1 h" }, { id: "120", label: "2 h" }, { id: "0", label: "Never" }]
                 current: String(NotifCenter.dndMinutes)
                 onPicked: id => NotifCenter.setDnd(true, parseInt(id))
+            }
+        }
+    }
+
+    SSection {
+        title: "History"
+
+        SRow {
+            title: "Save history"
+            hint: "Keeps the last 30 days (at most 500) of notifications in ~/.local/state/quickshell/notifs.jsonl, so the History tab survives a restart. The text of your messages is saved too: turn this off if you do not want that."
+            last: !NotifStore.saveHistory
+            Toggle {
+                checked: NotifStore.saveHistory
+                onToggled: NotifStore.setSaveHistory(!NotifStore.saveHistory)
+            }
+        }
+
+        SRow {
+            last: true
+            title: "Delete history"
+            hint: NotifStore.total < 0 ? "Removes every saved notification."
+                                       : (NotifStore.total === 1 ? "1 saved notification." : NotifStore.total + " saved notifications.")
+            SButton {
+                label: page.confirmDelete ? "Click again to delete" : "Delete"
+                onClicked: {
+                    if (page.confirmDelete) {
+                        page.confirmDelete = false
+                        confirmTimer.stop()
+                        NotifStore.clear()
+                    } else {
+                        page.confirmDelete = true
+                        confirmTimer.restart()
+                    }
+                }
             }
         }
     }

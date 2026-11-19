@@ -16,6 +16,7 @@ Scope {
                 UiState.wallpaperOpen = false
                 UiState.captureOpen = false
                 UiState.recMenuOpen = false
+                UiState.audioOpen = false
                 Style.variantOpen = false
             }
         }
@@ -35,11 +36,21 @@ Scope {
     }
     Connections {
         target: UiState
-        function onLauncherOpenChanged() { if (UiState.launcherOpen) { Appearance.pickerOpen = false; Style.variantOpen = false } }
-        function onPowerOpenChanged() { if (UiState.powerOpen) { Appearance.pickerOpen = false; Style.variantOpen = false } }
-        function onWallpaperOpenChanged() { if (UiState.wallpaperOpen) { Appearance.pickerOpen = false; Style.variantOpen = false } }
-        function onCaptureOpenChanged() { if (UiState.captureOpen) { Appearance.pickerOpen = false; Style.variantOpen = false } }
-        function onRecMenuOpenChanged() { if (UiState.recMenuOpen) { Appearance.pickerOpen = false; Style.variantOpen = false } }
+        function onLauncherOpenChanged() { if (UiState.launcherOpen) { Appearance.pickerOpen = false; Style.variantOpen = false; UiState.audioOpen = false } }
+        function onPowerOpenChanged() { if (UiState.powerOpen) { Appearance.pickerOpen = false; Style.variantOpen = false; UiState.audioOpen = false } }
+        function onWallpaperOpenChanged() { if (UiState.wallpaperOpen) { Appearance.pickerOpen = false; Style.variantOpen = false; UiState.audioOpen = false } }
+        function onCaptureOpenChanged() { if (UiState.captureOpen) { Appearance.pickerOpen = false; Style.variantOpen = false; UiState.audioOpen = false } }
+        function onRecMenuOpenChanged() { if (UiState.recMenuOpen) { Appearance.pickerOpen = false; Style.variantOpen = false; UiState.audioOpen = false } }
+        function onAudioOpenChanged() {
+            if (UiState.audioOpen) {
+                Appearance.pickerOpen = false
+                Style.variantOpen = false
+                UiState.launcherOpen = false
+                UiState.powerOpen = false
+                UiState.captureOpen = false
+                UiState.recMenuOpen = false
+            }
+        }
     }
 
     // qs ipc call settings toggle | open | close | page appearance|bar|notifications|wallpaper|displays|network|bluetooth|audio|power|keys|about
@@ -171,7 +182,8 @@ Scope {
             if (Style.variantOpen) Style.variantOpen = false
             else Style.openVariants(Compositor.focusedMonitor)
         }
-        function setvariant(name: string): void { Style.setDashVariant(name) }
+        // Classic: bar, full, capsules, floating   ·   Dashboard: pill, attached
+        function setvariant(name: string): void { Style.setVariant(name) }
     }
 
     // qs ipc call audio dump   (writes the PipeWire nodes the shell sees to the log)
@@ -202,6 +214,41 @@ Scope {
         function open(): void { SysStats.show(6000) }
         function toggle(): void { SysStats.togglePin() }
         function hide(): void { SysStats.hide() }
+    }
+
+    // qs ipc call sysmon toggle | open | close | view <cpu|ram|gpu|temp|proc|net>   (System Monitor)
+    IpcHandler {
+        target: "sysmon"
+
+        function toggle(): void { SysStats.toggleMonitor() }
+        function open(): void { SysStats.openMonitor("", "") }
+        function close(): void { SysStats.closeMonitor() }
+        function view(name: string): void { SysStats.setView(name); if (!SysStats.monitorOpen) SysStats.openMonitor("", "") }
+    }
+
+    // qs ipc call audiocenter toggle | open | close   (the Audio Center: equalizer and sound controls)
+    IpcHandler {
+        target: "audiocenter"
+
+        function toggle(): void { UiState.toggleAudio() }
+        function open(): void { UiState.openAudio() }
+        function close(): void { UiState.audioOpen = false }
+    }
+
+    // qs ipc call audiofx toggle | on | off | preset Rock | next | prev | status
+    // (the equalizer itself, without opening anything)
+    IpcHandler {
+        target: "audiofx"
+
+        function toggle(): void { AudioFx.toggle() }
+        function on(): void { AudioFx.setEnabled(true) }
+        function off(): void { AudioFx.setEnabled(false) }
+        function preset(name: string): void { AudioFx.setPreset(name); AudioFx.setEnabled(true) }
+        function next(): string { return AudioFx.nextPreset(1) }
+        function prev(): string { return AudioFx.nextPreset(-1) }
+        function status(): string {
+            return (AudioFx.active ? "on" : (AudioFx.enabled ? "starting" : "off")) + " " + (AudioFx.preset || "custom") + (AudioFx.error ? " (" + AudioFx.error + ")" : "")
+        }
     }
 
     // qs ipc call lock lock   (locks the screen)

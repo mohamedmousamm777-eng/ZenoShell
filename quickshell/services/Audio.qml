@@ -26,7 +26,7 @@ Singleton {
         const v = Pipewire.nodes.values
         const out = []
         for (let i = 0; i < v.length; i++)
-            if (v[i].isSink && !v[i].isStream) out.push(v[i])
+            if (v[i].isSink && !v[i].isStream && !AudioFx.isFx(v[i])) out.push(v[i])
         return out
     }
 
@@ -47,7 +47,7 @@ Singleton {
         const out = []
         for (let i = 0; i < v.length; i++) {
             const n = v[i]
-            if (n.audio === null) continue
+            if (n.audio === null || AudioFx.isFx(n)) continue
 
             const p = n.properties
             const cls = p ? (p["media.class"] || "") : ""
@@ -88,8 +88,13 @@ Singleton {
         if (micReady) source.audio.muted = !source.audio.muted
     }
 
+    // The output to show as the chosen one: with the equalizer on, the default is its virtual output
+    // and the real one is where it plays
+    readonly property var realSink: AudioFx.active ? (sinks.find(n => n.name === AudioFx.target) || null) : sink
+
     function setDefault(node) {
-        Pipewire.preferredDefaultAudioSink = node
+        if (AudioFx.enabled) AudioFx.setTarget(node)
+        else Pipewire.preferredDefaultAudioSink = node
     }
 
     function setDefaultSource(node) {

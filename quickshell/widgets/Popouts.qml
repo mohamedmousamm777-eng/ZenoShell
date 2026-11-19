@@ -22,9 +22,10 @@ Item {
 
     // Same interface as the other islands, so the bar can drive it (Esc)
     readonly property bool expanded: current !== ""
-    readonly property bool needsKeyboard: expanded && current === "wifi" && wifiPage.needsKeyboard
+    readonly property bool needsKeyboard: expanded && ((current === "wifi" && wifiPage.needsKeyboard) || (current === "notifs" && notifsPanel.needsKeyboard))
     // Only launcher and power menu take the keyboard: the others open on hover and must not steal it
     readonly property bool wantsKeyboard: current === "launcher" || current === "power" || current === "capture" || current === "naming" || current === "theme"
+                                       || (current === "notifs" && notifsPanel.needsKeyboard)
     readonly property bool busy: needsKeyboard || current === "power" || current === "theme" || current === "capture" || current === "naming"
                                  || (current === "launcher" && launcherPanel.query !== "")
                                  || soundPage.dragging || displayPage.dragging || toolsPage.dragging
@@ -38,6 +39,7 @@ Item {
     readonly property var sizes: ({
         "calendar":  [340, 330],
         "media":     [300, 392],
+        "audio":     [340, 416],
         "notifs":    [340, 420],
         "quick":     [340, 344],
         "tools":     [360, 546],
@@ -113,6 +115,9 @@ Item {
         const was = prev
         prev = current
         if (current !== "" && sizes[current]) lastSize = sizes[current]
+
+        // The Audio Center is closed by any other panel (or by the bar)
+        if (was === "audio" && current !== "audio" && UiState.audioOpen && mine(UiState.audioScreen)) UiState.audioOpen = false
 
         // Closing the name prompt in any way keeps the recording (with the date and time name)
         if (was === "naming" && current !== "naming" && Capture.naming) Capture.finishNaming("")
@@ -210,6 +215,15 @@ Item {
                 if (root.mine(UiState.launcherScreen) && root.current !== "launcher")
                     root.open("launcher", root.stageH / 2)
             } else if (root.current === "launcher") {
+                root.close()
+            }
+        }
+
+        function onAudioOpenChanged() {
+            if (UiState.audioOpen) {
+                if (root.mine(UiState.audioScreen) && root.current !== "audio")
+                    root.open("audio", root.stageH / 2)
+            } else if (root.current === "audio") {
                 root.close()
             }
         }
@@ -367,10 +381,27 @@ Item {
                 Behavior on opacity { NumberAnimation { duration: 160 } }
 
                 sourceComponent: MusicPanel {
+                    onAudioRequested: {
+                        UiState.audioScreen = root.screenName
+                        UiState.audioOpen = true
+                    }
                 }
             }
 
             Lazy {
+                wanted: root.current === "audio"
+                opacity: wanted ? 1 : 0
+                visible: opacity > 0
+                Behavior on opacity { NumberAnimation { duration: 160 } }
+
+                sourceComponent: Item {
+                    MusicStrip { x: 10; y: 10; width: 320; height: 56 }
+                    EqPanel { y: 66; kind: "curve"; style: "inner" }
+                }
+            }
+
+            Lazy {
+                id: notifsPanel
                 wanted: root.current === "notifs"
                 opacity: wanted ? 1 : 0
                 visible: opacity > 0

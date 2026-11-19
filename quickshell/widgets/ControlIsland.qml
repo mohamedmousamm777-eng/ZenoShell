@@ -39,8 +39,9 @@ Rectangle {
     width:  expanded ? cardW : (classic ? 104 : Theme.islandHeight)
     height: expanded ? cardH : Theme.islandHeight
     radius: Math.min(26, height / 2)
-    color: (!expanded && hovered) ? Theme.islandHover : Theme.island
-    border.width: 1
+    readonly property bool bare: classic && !expanded && Style.classicPlain
+    color: bare ? "transparent" : ((!expanded && hovered) ? Theme.islandHover : Theme.island)
+    border.width: bare ? 0 : 1
     border.color: Theme.border
     clip: true
 

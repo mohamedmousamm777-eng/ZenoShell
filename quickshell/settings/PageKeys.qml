@@ -10,10 +10,10 @@ SPage {
     readonly property var groups: [
         { name: "Launch", keys: [
             ["Mod+R  /  Alt+R", "Launcher"], ["Mod+M  /  Alt+P", "Power menu"], ["Alt+L", "Lock the screen"],
-            ["Alt+O", "These settings"], ["Alt+W", "Wallpaper picker"], ["Alt+Shift+W", "Animated wallpaper picker"], ["Alt+I", "System resources"] ] },
+            ["Alt+O", "These settings"], ["Alt+W", "Wallpaper picker"], ["Alt+Shift+W", "Animated wallpaper picker"], ["Alt+I", "System resources"], ["Alt+Shift+M", "Weather and map"] ] },
         { name: "Look", keys: [
             ["Alt+S", "Style picker"], ["Mod+Alt+1 … 4", "Island, Classic, Dashboard, Vertical"], ["Alt+T", "Theme picker"],
-            ["Mod+Alt+T", "Light / dark"], ["Alt+V", "Dashboard version"] ] },
+            ["Mod+Alt+T", "Light / dark"], ["Alt+V", "Dashboard / Classic look"] ] },
         { name: "Modes", keys: [
             ["Alt+G", "Game Mode"], ["Alt+E", "Eco Mode"], ["Alt+D", "Do Not Disturb"],
             ["Mod+Space", "Next keyboard layout"], ["Alt+Tab", "Show the workspaces"] ] },

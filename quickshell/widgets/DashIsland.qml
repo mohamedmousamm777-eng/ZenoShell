@@ -133,7 +133,19 @@ Rectangle {
     readonly property var dots: Compositor.dotsFor(screenName)
     readonly property int activeId: Compositor.activeIdFor(screenName)
 
+    // Audio Center: the shortcut (or the button) opens the Dashboard on its equalizer view
+    Connections {
+        target: UiState
+        function onAudioOpenChanged() {
+            if (UiState.audioOpen && UiState.audioScreen === root.screenName) {
+                root.page = "dash"
+                root.mode = "open"
+            }
+        }
+    }
+
     onModeChanged: {
+        if (mode !== "open" && UiState.audioOpen && UiState.audioScreen === screenName) UiState.audioOpen = false
         UiState.controlOpen = mode === "open"
         if (mode === "open") contentTimer.restart()
         else { contentTimer.stop(); contentOn = false }
@@ -924,6 +936,7 @@ Rectangle {
 
         sourceComponent: DashPage {
             x: 0; y: root.headerH
+            screenName: root.screenName
             onOpenPage: name => root.page = name
             onPasted: root.mode = "closed"
         }

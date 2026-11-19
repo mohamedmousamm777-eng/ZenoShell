@@ -85,6 +85,11 @@ Singleton {
             notification.tracked = true
 
             const critical = notification.urgency === NotificationUrgency.Critical
+
+            // saved history (also what Do Not Disturb silences: it is still in the list)
+            NotifStore.add(notification.appName, notification.summary, notification.body,
+                           critical ? 2 : (notification.urgency === NotificationUrgency.Low ? 0 : 1))
+
             if (root.dnd && !critical) {          // Do Not Disturb: no toast and no dot
                 root.suppressed++
                 return

@@ -8,15 +8,18 @@ Item {
 
     signal closeRequested()
 
+    Component.onDestruction: Search.setQuery("")
+
     property string query: ""
     property string sector: "All"
-    readonly property var results: Apps.filter(query, sector)
+    readonly property var results: Search.compute(query, sector)
 
     function reset() {
         const initial = UiState.launcherInitial
         UiState.launcherInitial = ""
         search.text = initial
         query = initial
+        Search.setQuery(initial)
         sector = "All"
         list.currentIndex = 0
         search.forceActiveFocus()
@@ -24,8 +27,7 @@ Item {
     }
 
     function launch(item) {
-        Apps.launch(item.entry)
-        root.closeRequested()
+        if (Search.run(item)) root.closeRequested()
     }
 
     function cycleSector(d) {
@@ -74,6 +76,7 @@ Item {
 
         onTextChanged: {
             root.query = text
+            Search.setQuery(text)
             list.currentIndex = 0
         }
 
@@ -102,7 +105,8 @@ Item {
                 event.accepted = true
             } else if (event.key === Qt.Key_F && (event.modifiers & Qt.ControlModifier)) {
                 // Ctrl+F: adds/removes the selected app from favorites
-                if (list.count > 0 && list.currentIndex < root.results.length)
+                if (list.count > 0 && list.currentIndex < root.results.length
+                        && root.results[list.currentIndex].kind === undefined)
                     Apps.toggleFavorite(root.results[list.currentIndex].id)
                 event.accepted = true
             } else if (event.key === Qt.Key_Escape) {
@@ -239,10 +243,33 @@ Item {
                 visible: row.current
             }
 
+            readonly property bool isApp: row.modelData.kind === undefined
+
+            // Non-app results (calculator, files, web…): a round tile with a letter or emoji
+            Rectangle {
+                x: 14; y: 10
+                width: 28; height: 28
+                radius: 14
+                visible: !row.isApp
+                color: Theme.surfaceSoft
+                border.width: 1
+                border.color: Theme.border
+
+                Text {
+                    anchors.centerIn: parent
+                    text: row.isApp ? "" : row.modelData.glyph
+                    color: row.modelData.big ? Theme.foreground : Theme.accent
+                    font.family: Theme.fontFamily
+                    font.pixelSize: row.modelData.big ? 16 : 12
+                    font.bold: true
+                }
+            }
+
             Image {
                 x: 14; y: 10
                 width: 28; height: 28
-                source: Quickshell.iconPath(row.modelData.icon, "application-x-executable")
+                visible: row.isApp
+                source: row.isApp ? Quickshell.iconPath(row.modelData.icon, "application-x-executable") : ""
                 sourceSize: Qt.size(56, 56)
                 smooth: true
             }
@@ -282,7 +309,7 @@ Item {
                 cursorShape: Qt.PointingHandCursor
                 onPositionChanged: list.currentIndex = row.index
                 onClicked: mouse => {
-                    if (mouse.button === Qt.RightButton) Apps.toggleFavorite(row.modelData.id)
+                    if (mouse.button === Qt.RightButton) { if (row.isApp) Apps.toggleFavorite(row.modelData.id) }
                     else root.launch(row.modelData)
                 }
             }
@@ -291,13 +318,13 @@ Item {
             Item {
                 id: star
 
-                readonly property bool fav: Apps.isFavorite(row.modelData.id)
+                readonly property bool fav: row.isApp && Apps.isFavorite(row.modelData.id)
 
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
                 width: 26; height: 26
-                visible: fav || row.current
+                visible: row.isApp && (fav || row.current)
 
                 Glyph {
                     anchors.centerIn: parent
@@ -324,10 +351,7 @@ Item {
         verticalAlignment: Text.AlignVCenter
         visible: root.results.length === 0
         wrapMode: Text.WordWrap
-        text: root.query !== "" ? "No apps found"
-              : (root.sector === "Favorites" ? "No favorites yet: press Ctrl+F or right-click an app"
-              : (root.sector === "Recent" ? "No recent apps: open one from the launcher"
-              : "No apps found"))
+        text: Search.hint(root.query, root.sector)
         color: Theme.muted
         opacity: 0.7
         font.family: Theme.fontFamily

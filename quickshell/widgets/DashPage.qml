@@ -11,7 +11,11 @@ Item {
 
     signal openPage(string name)
     signal pasted()
-    property bool dragging: soundSlider.pressed || lightSlider.pressed || micSlider.pressed || dayMode
+    property string screenName: ""
+    property bool dragging: soundSlider.pressed || lightSlider.pressed || micSlider.pressed || dayMode || audioHere
+
+    // Audio Center: the equalizer takes the place of everything to the right of the music card
+    readonly property bool audioHere: UiState.audioOpen && UiState.audioScreen === screenName
 
     readonly property var bt: Bluetooth.defaultAdapter
 
@@ -45,7 +49,7 @@ Item {
         ClipHist.active = visible
         if (visible && !counted) { SysStats.users++; counted = true }
         else if (!visible && counted) { SysStats.users--; counted = false }
-        if (!visible) dayMode = false
+        if (!visible) { dayMode = false; if (audioHere) UiState.audioOpen = false }
         if (visible) {
             ClipHist.refresh()
             today = new Date()
@@ -157,6 +161,33 @@ Item {
             elide: Text.ElideRight
         }
 
+        // Audio Center (equalizer)
+        Rectangle {
+            x: parent.width - width - 10; y: 10
+            width: 26; height: 26
+            radius: 13
+            color: root.audioHere ? Theme.accent : (eqMouse.containsMouse ? Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.28) : Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.14))
+            Behavior on color { ColorAnimation { duration: 120 } }
+
+            Glyph {
+                anchors.centerIn: parent
+                kind: "eq"
+                size: 13
+                color: root.audioHere ? Theme.island : Theme.foreground
+            }
+
+            MouseArea {
+                id: eqMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    if (root.audioHere) UiState.audioOpen = false
+                    else { UiState.audioScreen = root.screenName; UiState.audioOpen = true }
+                }
+            }
+        }
+
         Row {
             y: 204
             anchors.horizontalCenter: parent.horizontalCenter
@@ -219,8 +250,21 @@ Item {
         }
     }
 
+    // ---------- Audio Center ----------
+    Lazy {
+        id: audioPanel
+        wanted: root.audioHere
+        x: 202; y: 0
+        opacity: wanted ? 1 : 0
+        visible: opacity > 0
+        Behavior on opacity { NumberAnimation { duration: 160 } }
+
+        sourceComponent: EqPanel { kind: "curve"; style: "wide" }
+    }
+
     // ---------- Tiles ----------
     Row {
+        visible: !root.audioHere
         x: 202; y: 0
         spacing: 8
 
@@ -282,6 +326,7 @@ Item {
 
     // ---------- Sliders ----------
     Row {
+        visible: !root.audioHere
         x: 202; y: 58
         spacing: 10
 
@@ -325,6 +370,7 @@ Item {
 
     // ---------- Calendar (a click on a day opens its notes in the same space) ----------
     Item {
+        visible: !root.audioHere
         x: 202; y: 96
         width: 196; height: 212
 
@@ -388,6 +434,7 @@ Item {
 
     // ---------- Notifications (half of the free space) ----------
     Rectangle {
+        visible: !root.audioHere
         x: 410; y: 96
         width: 170; height: 212
         radius: 20
@@ -537,6 +584,7 @@ Item {
 
     // ---------- Clipboard (the other half) ----------
     ClipCard {
+        visible: !root.audioHere
         x: 588; y: 96
         width: 170; height: 212
         onPasted: root.pasted()
@@ -544,6 +592,7 @@ Item {
 
     // ---------- Meters: CPU · RAM · battery ----------
     Rectangle {
+        visible: !root.audioHere
         x: 770; y: 0
         width: 76; height: root.height
         radius: 24
@@ -612,6 +661,13 @@ Item {
                     charging: Battery.charging
                     outline: Theme.foreground
                     fillColor: Battery.tone
+                }
+
+                // A click opens the System Monitor on that reading
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: SysStats.openMonitor(root.screenName, meter.index === 1 ? "ram" : "cpu")
                 }
             }
         }

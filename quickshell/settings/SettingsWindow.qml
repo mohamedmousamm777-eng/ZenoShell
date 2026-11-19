@@ -19,6 +19,7 @@ Scope {
         { id: "network",       label: "Network",                icon: "wifi",      file: "PageNetwork.qml" },
         { id: "bluetooth",     label: "Bluetooth",              icon: "bluetooth", file: "PageBluetooth.qml" },
         { id: "audio",         label: "Audio",                  icon: "volume",    file: "PageAudio.qml" },
+        { id: "weather",       label: "Weather & map",          icon: "sun",       file: "PageWeather.qml" },
         { id: "power",         label: "Power & battery",        icon: "power",     file: "PagePower.qml" },
         { id: "keys",          label: "Shortcuts",              icon: "gear",      file: "PageKeys.qml" },
         { id: "about",         label: "About",                  icon: "flag",      file: "PageAbout.qml" }

@@ -123,7 +123,7 @@ Item {
                 delegate: ListRow {
                     required property var modelData
 
-                    readonly property bool isDefault: Audio.sink === modelData
+                    readonly property bool isDefault: Audio.realSink === modelData
 
                     width: col.width
                     icon: "volume"

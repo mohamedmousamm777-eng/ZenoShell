@@ -13,6 +13,10 @@ binds {
     Alt+I         { spawn "qs" "ipc" "call" "system" "toggle"; }
     Alt+O         { spawn "qs" "ipc" "call" "settings" "toggle"; }
     Alt+Tab       { spawn "qs" "ipc" "call" "workspaces" "peek"; }
+    Alt+A         { spawn "qs" "ipc" "call" "audiocenter" "toggle"; }
+    Alt+Shift+A   { spawn "qs" "ipc" "call" "audiofx" "toggle"; }
+    Alt+M         { spawn "qs" "ipc" "call" "sysmon" "toggle"; }
+    Alt+Shift+M   { spawn "qs" "ipc" "call" "weather" "toggle"; }
 
     // ── Modes ──
     Alt+G         { spawn "qs" "ipc" "call" "gamemode" "toggle"; }

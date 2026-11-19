@@ -11,6 +11,8 @@ Item {
     width: 300
     height: 392
 
+    signal audioRequested()
+
     ClippingRectangle {
         x: 10; y: 10
         width: parent.width - 20
@@ -42,6 +44,30 @@ Item {
             anchors.fill: parent
             visible: Media.active && Media.artUrl !== ""
             color: Theme.scrim
+        }
+
+        // Audio Center (equalizer)
+        Rectangle {
+            x: parent.width - width - 10; y: 10
+            width: 26; height: 26
+            radius: 13
+            color: eqMouse.containsMouse ? Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.28) : Qt.rgba(Theme.foreground.r, Theme.foreground.g, Theme.foreground.b, 0.14)
+            Behavior on color { ColorAnimation { duration: 120 } }
+
+            Glyph {
+                anchors.centerIn: parent
+                kind: "eq"
+                size: 13
+                color: Theme.foreground
+            }
+
+            MouseArea {
+                id: eqMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.audioRequested()
+            }
         }
 
         // The record

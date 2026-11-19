@@ -79,7 +79,7 @@ Rectangle {
     readonly property int powerH: 190
     readonly property int themeW: 700
     readonly property int themeH: 184
-    readonly property int variantW: 520
+    readonly property int variantW: Style.current === "classic" ? 600 : 520
     readonly property int variantH: 190
     readonly property int captureW: 470
     readonly property int captureH: 196
@@ -125,8 +125,10 @@ Rectangle {
     readonly property real corner: Math.min(24, Math.max(18, height / 3))
 
     radius: attachedLook ? corner : Math.min(24, height / 2)
-    color: attachedLook ? "transparent" : Theme.island
-    border.width: attachedLook ? 0 : 1
+    // Classic "Full" / "Floating" looks: the collapsed clock is bare (no capsule)
+    readonly property bool bare: Style.classicPlain && mode === "idle"
+    color: (attachedLook || bare) ? "transparent" : Theme.island
+    border.width: (attachedLook || bare) ? 0 : 1
     border.color: edgeColor
     clip: true
 

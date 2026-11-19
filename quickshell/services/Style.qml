@@ -20,6 +20,20 @@ Singleton {
         { id: "pill",     name: "Pill",     hint: "The floating pill" },
         { id: "attached", name: "Attached", hint: "A bar fused with the top edge" }
     ]
+    // Looks of the Classic style (Alt+V): "bar" is the original one
+    property string classicVariant: "bar"
+    readonly property bool classicBar: current === "classic" && classicVariant === "bar"
+    readonly property bool classicLook: current === "classic" && classicVariant !== "bar"
+    readonly property var classicVariants: [
+        { id: "bar",       name: "Bar",       hint: "The original islands" },
+        { id: "full",      name: "Full",      hint: "Band across the screen" },
+        { id: "capsules",  name: "Capsules",  hint: "Separate dark capsules" },
+        { id: "floating",  name: "Floating",  hint: "Small pills and a dock" }
+    ]
+
+    // Looks where the pieces have no capsule of their own ("Full": bare on the wallpaper; "Floating": inside one group)
+    readonly property bool classicPlain: classicLook && (classicVariant === "full" || classicVariant === "floating")
+
     property bool variantOpen: false        // the selector, inside the pill
     property string variantScreen: ""
 
@@ -49,7 +63,7 @@ Singleton {
     }
 
     function save() {
-        try { store.setText(JSON.stringify({ style: current, dashVariant: dashVariant })) } catch (e) { console.log("style: save:", e) }
+        try { store.setText(JSON.stringify({ style: current, dashVariant: dashVariant, classicVariant: classicVariant })) } catch (e) { console.log("style: save:", e) }
     }
 
     function setDashVariant(id) {
@@ -58,6 +72,16 @@ Singleton {
         }
         return false
     }
+
+    function setClassicVariant(id) {
+        for (let i = 0; i < classicVariants.length; i++) {
+            if (classicVariants[i].id === id) { classicVariant = id; save(); return true }
+        }
+        return false
+    }
+
+    // Applies a version of the current style (Dashboard or Classic): used by Alt+V and the IPC
+    function setVariant(id) { return current === "classic" ? setClassicVariant(id) : setDashVariant(id) }
 
     function openVariants(screenName) {
         variantScreen = screenName
@@ -73,6 +97,8 @@ Singleton {
             for (let i = 0; i < styles.length; i++)
                 if (styles[i].id === d.style && styles[i].ready) current = d.style
             if (d.dashVariant === "pill" || d.dashVariant === "attached") dashVariant = d.dashVariant
+            for (let i = 0; i < classicVariants.length; i++)
+                if (classicVariants[i].id === d.classicVariant) classicVariant = d.classicVariant
         } catch (e) {}
     }
 }

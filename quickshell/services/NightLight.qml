@@ -23,10 +23,13 @@ Singleton {
     function set(enable) {
         wanted = enable
         proc.running = enable
+        if (!enable) Quickshell.execDetached(["pkill", "-x", "gammastep"])
         save()
     }
 
-    function toggle() { set(!wanted) }
+    // Decides from what is really happening (gammastep running or not), not from what was saved:
+    // if the saved state says "on" but gammastep never started, one click turns it on
+    function toggle() { set(!on) }
 
     function setTemperature(t) {
         temperature = Math.round(Math.max(2500, Math.min(6500, t)) / 100) * 100
@@ -73,7 +76,8 @@ Singleton {
 
     Process {
         id: proc
-        command: ["gammastep", "-O", String(root.temperature)]
+        // Closes any gammastep left over from an earlier shell first: only one can hold the screen
+        command: ["sh", "-c", "pkill -x gammastep; exec gammastep -O \"$1\"", "sh", String(root.temperature)]
         onRunningChanged: {
             if (!running && root.restartPending) {
                 root.restartPending = false

@@ -11,16 +11,18 @@ Item {
     property int sel: 0
     property string original: "pill"
 
-    readonly property var items: Style.dashVariants
+    readonly property bool classic: Style.current === "classic"
+    readonly property var items: classic ? Style.classicVariants : Style.dashVariants
+    readonly property string currentId: classic ? Style.classicVariant : Style.dashVariant
 
-    implicitWidth: 520
+    implicitWidth: classic ? 600 : 520
     implicitHeight: 190
 
     function reset() {
-        original = Style.dashVariant
+        original = currentId
         sel = 0
         for (let i = 0; i < items.length; i++)
-            if (items[i].id === Style.dashVariant) sel = i
+            if (items[i].id === currentId) sel = i
         focusTimer.restart()
     }
 
@@ -40,7 +42,7 @@ Item {
 
     function applyNow() {
         applyTimer.stop()
-        Style.setDashVariant(items[sel].id)
+        Style.setVariant(items[sel].id)
     }
 
     function go(i) {
@@ -51,7 +53,7 @@ Item {
 
     function close(keep) {
         if (keep) applyNow()
-        else { applyTimer.stop(); Style.setDashVariant(original) }
+        else { applyTimer.stop(); Style.setVariant(original) }
         Style.variantOpen = false
     }
 
@@ -72,7 +74,7 @@ Item {
 
     Text {
         x: 24; y: 18
-        text: "Dashboard"
+        text: root.classic ? "Classic" : "Dashboard"
         color: Theme.foreground
         font.family: Theme.fontFamily
         font.pixelSize: 15
@@ -103,9 +105,9 @@ Item {
                 required property int index
 
                 readonly property bool chosen: root.sel === index
-                readonly property bool current: Style.dashVariant === modelData.id
+                readonly property bool current: root.currentId === modelData.id
 
-                width: 200
+                width: root.classic ? 134 : 200
                 height: 92
                 radius: 16
                 color: optMouse.containsMouse ? Theme.islandHover : Theme.surfaceSoft
@@ -156,6 +158,46 @@ Item {
                         Rectangle { x: (parent.width - 96) / 2 + 40; y: 10; width: 16; height: 6; radius: 3; color: Theme.foreground }
                         Rectangle { x: (parent.width - 96) / 2 + 96 - 24; y: 10; width: 14; height: 6; radius: 3; color: Theme.muted }
                     }
+
+                    // ---- Classic looks ----
+                    Item {
+                        visible: opt.modelData.id === "bar"
+                        anchors.fill: parent
+                        Rectangle { x: 2; y: 8; width: 14; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: 20; y: 8; width: 30; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: parent.width / 2 - 14; y: 8; width: 28; height: 14; radius: 7; color: Theme.accent }
+                        Rectangle { x: parent.width - 30; y: 8; width: 28; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                    }
+                    Item {
+                        visible: opt.modelData.id === "full"
+                        anchors.fill: parent
+                        Rectangle { x: 0; y: 4; width: parent.width; height: 22; radius: 3; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: 6; y: 11; width: 8; height: 8; radius: 4; color: Theme.foreground }
+                        Rectangle { x: 20; y: 13; width: 20; height: 4; radius: 2; color: Theme.muted }
+                        Rectangle { x: parent.width / 2 - 12; y: 11; width: 24; height: 8; radius: 4; color: Theme.accent }
+                        Rectangle { x: parent.width - 36; y: 13; width: 30; height: 4; radius: 2; color: Theme.muted }
+                    }
+                    Item {
+                        visible: opt.modelData.id === "capsules"
+                        anchors.fill: parent
+                        Rectangle { x: 0; y: 8; width: 12; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: 15; y: 8; width: 22; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: 40; y: 8; width: 18; height: 14; radius: 7; color: Theme.accent }
+                        Rectangle { x: parent.width / 2 - 2; y: 8; width: 22; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: parent.width - 40; y: 8; width: 40; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                    }
+                    Item {
+                        visible: opt.modelData.id === "floating"
+                        anchors.fill: parent
+                        Rectangle { x: 4; y: 8; width: 22; height: 4; radius: 2; color: Theme.muted }
+                        Rectangle { x: parent.width / 2 - 14; y: 4; width: 28; height: 12; radius: 6; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: parent.width - 52; y: 4; width: 50; height: 12; radius: 6; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Rectangle { x: parent.width / 2 - 26; y: 24; width: 52; height: 14; radius: 7; color: Theme.island; border.width: 1; border.color: Theme.border }
+                        Repeater {
+                            model: 4
+                            Rectangle { required property int index; x: parent.width / 2 - 20 + index * 11; y: 28; width: 6; height: 6; radius: 3; color: index === 1 ? Theme.accent : Theme.foreground }
+                        }
+                    }
                 }
 
                 Text {
@@ -200,7 +242,7 @@ Item {
         x: 24
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 14
-        text: Style.current === "dash" ? "← →  browse   ·   Esc  cancel" : "Versions are only for the Dashboard style (Mod+Alt+3)"
+        text: (Style.current === "dash" || Style.current === "classic") ? "← →  browse   ·   Esc  cancel" : "Versions: Classic (Mod+Alt+2) and Dashboard (Mod+Alt+3)"
         color: Theme.muted
         font.family: Theme.fontFamily
         font.pixelSize: 11

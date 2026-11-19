@@ -2,7 +2,7 @@ import QtQuick
 import qs.theme
 
 // wifi | bluetooth | focus | game | lock | moon | volume | sun | power | logout | reboot
-// play | pause | stop | flag | hourglass | stopwatch | star | gear | bell | grid | cpu | ram (level 0 = empty, otherwise filled)
+// eq | play | pause | stop | flag | hourglass | stopwatch | star | gear | bell | grid | cpu | ram (level 0 = empty, otherwise filled)
 Canvas {
     id: root
 
@@ -200,6 +200,15 @@ Canvas {
                 ctx.lineTo(13, 13)
                 ctx.stroke()
             }
+        } else if (kind === "eq") {
+            ctx.beginPath()
+            ctx.moveTo(3.5, 2); ctx.lineTo(3.5, 14)
+            ctx.moveTo(8, 2); ctx.lineTo(8, 14)
+            ctx.moveTo(12.5, 2); ctx.lineTo(12.5, 14)
+            ctx.stroke()
+            ctx.beginPath(); ctx.arc(3.5, 10, 1.9, 0, Math.PI * 2); ctx.fill()
+            ctx.beginPath(); ctx.arc(8, 5.5, 1.9, 0, Math.PI * 2); ctx.fill()
+            ctx.beginPath(); ctx.arc(12.5, 8.5, 1.9, 0, Math.PI * 2); ctx.fill()
         } else if (kind === "play") {
             ctx.beginPath()
             ctx.moveTo(4.5, 2.5)

@@ -68,6 +68,10 @@ function M.apply()
     bind("ALT + I",                qs("system toggle"))
     bind("ALT + O",                qs("settings toggle"))
     bind("ALT + TAB",              qs("workspaces peek"))
+    bind("ALT + A",                qs("audiocenter toggle"))
+    bind("ALT + SHIFT + A",        qs("audiofx toggle"))
+    bind("ALT + M",                qs("sysmon toggle"))
+    bind("ALT + SHIFT + M",        qs("weather toggle"))
 
     -- ── Shell: modalità ──
     bind("ALT + G",                qs("gamemode toggle"))
